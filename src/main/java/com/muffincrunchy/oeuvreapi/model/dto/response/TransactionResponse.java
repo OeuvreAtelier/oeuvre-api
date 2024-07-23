@@ -11,7 +11,7 @@ import java.util.List;
 public class TransactionResponse {
 
     private String id;
-    private String customerId;
+    private String userId;
     private Date transDate;
     private List<TransactionDetailResponse> transactionDetails;
 }

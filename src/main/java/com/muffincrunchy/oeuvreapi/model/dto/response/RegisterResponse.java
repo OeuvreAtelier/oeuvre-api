@@ -9,7 +9,6 @@ import java.util.List;
 @Builder
 public class RegisterResponse {
     private String username;
-    private String name;
     private List<String> roles;
 }
 
