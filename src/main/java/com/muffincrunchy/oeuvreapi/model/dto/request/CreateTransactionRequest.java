@@ -12,9 +12,9 @@ import java.util.List;
 @Builder
 public class CreateTransactionRequest {
 
-    @NotBlank(message = "customer_id is required")
-    @JsonProperty("customer_id")
-    private String customerId;
+    @NotBlank(message = "user_id is required")
+    @JsonProperty("user_id")
+    private String userId;
 
     @NotNull(message = "transaction_details is required")
     @JsonProperty("transaction_details")

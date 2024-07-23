@@ -25,9 +25,9 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @PostMapping("/register")
+    @PostMapping("/register-customer")
     public ResponseEntity<CommonResponse<?>> registerUser(@RequestBody RegisterRequest request){
-        RegisterResponse register = authService.register(request);
+        RegisterResponse register = authService.registerCustomer(request);
         CommonResponse<RegisterResponse> response = CommonResponse.<RegisterResponse>builder()
                 .statusCode(HttpStatus.CREATED.value())
                 .message("successfully save data")
@@ -36,10 +36,20 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @PostMapping("/register-artist")
+    public ResponseEntity<CommonResponse<?>> registerUser(){
+        RegisterResponse register = authService.registerArtist();
+        CommonResponse<RegisterResponse> response = CommonResponse.<RegisterResponse>builder()
+                .statusCode(HttpStatus.CREATED.value())
+                .message("successfully update data")
+                .data(register)
+                .build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
     @PostMapping("/login")
     public ResponseEntity<CommonResponse<?>> login(@RequestBody AuthRequest request){
         LoginResponse loginResponse = authService.login(request);
-//        log.info("login response: {}", loginResponse);
         CommonResponse<LoginResponse> response = CommonResponse.<LoginResponse>builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("login successfully")

@@ -1,18 +1,17 @@
 package com.muffincrunchy.oeuvreapi.service.impl;
 
+import com.muffincrunchy.oeuvreapi.model.constant.UserGender;
 import com.muffincrunchy.oeuvreapi.model.constant.UserRole;
 import com.muffincrunchy.oeuvreapi.model.dto.request.AuthRequest;
 import com.muffincrunchy.oeuvreapi.model.dto.request.RegisterRequest;
+import com.muffincrunchy.oeuvreapi.model.dto.request.UpdateUserRequest;
 import com.muffincrunchy.oeuvreapi.model.dto.response.LoginResponse;
 import com.muffincrunchy.oeuvreapi.model.dto.response.RegisterResponse;
-import com.muffincrunchy.oeuvreapi.model.entity.Artist;
+import com.muffincrunchy.oeuvreapi.model.entity.User;
 import com.muffincrunchy.oeuvreapi.model.entity.Role;
 import com.muffincrunchy.oeuvreapi.model.entity.UserAccount;
 import com.muffincrunchy.oeuvreapi.repository.UserAccountRepository;
-import com.muffincrunchy.oeuvreapi.service.ArtistService;
-import com.muffincrunchy.oeuvreapi.service.AuthService;
-import com.muffincrunchy.oeuvreapi.service.JwtService;
-import com.muffincrunchy.oeuvreapi.service.RoleService;
+import com.muffincrunchy.oeuvreapi.service.*;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,10 +33,12 @@ import java.util.Optional;
 public class AuthServiceImpl implements AuthService {
 
     private final UserAccountRepository userAccountRepository;
+    private final UserAccountService userAccountService;
     private final RoleService roleService;
     private final PasswordEncoder passwordEncoder;
-    private final ArtistService artistService;
+    private final UserService userService;
     private final JwtService jwtService;
+    private final GenderService genderService;
 
     private final AuthenticationManager authenticationManager;
 
@@ -65,19 +66,23 @@ public class AuthServiceImpl implements AuthService {
                 .build();
         userAccountRepository.save(adminAccount);
 
-        Artist artistAdmin = Artist.builder()
-                .name("Admin")
-                .birthDate(Date.valueOf("2001-01-01"))
-                .email("admin@gmail.com")
-                .phoneNo("089876543210")
+        User userAdmin = User.builder()
+                .firstName("Sakasaki")
+                .lastName("Rei")
+                .displayName("Sakasaki Rei")
+                .email("saka@admin.com")
+                .gender(genderService.getOrSave(UserGender.MALE))
+                .birthDate(Date.valueOf("2001-05-05"))
+                .phoneNumber("089876543210")
+                .isArtist(true)
                 .userAccount(adminAccount)
                 .build();
-        artistService.create(artistAdmin);
+        userService.create(userAdmin);
     }
 
     @Override
-    public RegisterResponse register(RegisterRequest request) {
-        Role role = roleService.getOrSave(UserRole.ROLE_ARTIST);
+    public RegisterResponse registerCustomer(RegisterRequest request) {
+        Role role = roleService.getOrSave(UserRole.ROLE_CUSTOMER);
         String hashedPassword = passwordEncoder.encode(request.getPassword());
         UserAccount userAccount = UserAccount.builder()
                 .username(request.getUsername())
@@ -86,14 +91,29 @@ public class AuthServiceImpl implements AuthService {
                 .isEnable(true)
                 .build();
         userAccountRepository.saveAndFlush(userAccount);
-        Artist artist = Artist.builder()
-                .name(request.getName())
+        User user = User.builder()
+                .displayName(request.getDisplayName())
+                .email(request.getEmail())
                 .userAccount(userAccount)
                 .build();
-        artistService.create(artist);
+        userService.create(user);
         return RegisterResponse.builder()
                 .username(userAccount.getUsername())
-                .name(artist.getName())
+                .roles(userAccount.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList())
+                .build();
+    }
+
+    @Override
+    public RegisterResponse registerArtist() {
+        UserAccount userAccount = userAccountService.getByContext();
+        List<Role> roles = userAccount.getRoles();
+        roles.add(roleService.getOrSave(UserRole.ROLE_ARTIST));
+        userAccount.setRoles(roles);
+        userAccountRepository.saveAndFlush(userAccount);
+        User user = userService.getByUserAccountId(userAccount.getId());
+        userService.updateArtistStatusById(user.getId(), true);
+        return RegisterResponse.builder()
+                .username(userAccount.getUsername())
                 .roles(userAccount.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList())
                 .build();
     }

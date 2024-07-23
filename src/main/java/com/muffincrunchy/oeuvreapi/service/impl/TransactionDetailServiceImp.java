@@ -17,20 +17,6 @@ public class TransactionDetailServiceImp implements TransactionDetailService {
 
     @Override
     public List<TransactionDetail> createBulk(List<TransactionDetail> transactionDetails) {
-        List<TransactionDetail> transactionDetailList = new ArrayList<>();
-        for (TransactionDetail transactionDetail : transactionDetails) {
-            transactionDetailRepository.createTransactionDetail(
-                    transactionDetail.getId(),
-                    transactionDetail.getTransaction().getId(),
-                    transactionDetail.getMerch().getId(),
-                    transactionDetail.getShipment().getId(),
-                    transactionDetail.getMerchPrice(),
-                    transactionDetail.getShipmentFee(),
-                    transactionDetail.getQty(),
-                    transactionDetail.getPayment().getId()
-            );
-            transactionDetailList.add(transactionDetail);
-        }
-        return transactionDetailList;
+        return transactionDetailRepository.saveAllAndFlush(transactionDetails);
     }
 }

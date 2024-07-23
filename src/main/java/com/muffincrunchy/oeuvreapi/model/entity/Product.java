@@ -3,16 +3,14 @@ package com.muffincrunchy.oeuvreapi.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "merchs")
-public class Merch {
+@Table(name = "products")
+public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -21,10 +19,6 @@ public class Merch {
     @Column(name = "name")
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private Category category;
-
     @Column(name = "price")
     private Long price;
 
@@ -32,16 +26,14 @@ public class Merch {
     private Integer stock;
 
     @ManyToOne
-    @JoinColumn(name = "artist_id")
-    private Artist artist;
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @ManyToOne
-    @JoinColumn(name = "type_id")
+    @JoinColumn(name = "category")
+    private Category category;
+
+    @ManyToOne
+    @JoinColumn(name = "type")
     private Type type;
-
-    @ManyToMany(fetch = FetchType.EAGER)
-    private List<Payment> payments;
-
-    @ManyToMany(fetch = FetchType.EAGER)
-    private List<Shipment> shipments;
 }

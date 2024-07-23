@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class UpdateMerchRequest {
+public class UpdateProductRequest {
 
     @NotBlank(message = "id is required")
     private String id;

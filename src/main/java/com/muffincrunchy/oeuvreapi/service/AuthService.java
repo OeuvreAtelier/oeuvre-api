@@ -6,7 +6,8 @@ import com.muffincrunchy.oeuvreapi.model.dto.response.LoginResponse;
 import com.muffincrunchy.oeuvreapi.model.dto.response.RegisterResponse;
 
 public interface AuthService {
-    RegisterResponse register(RegisterRequest request);
+    RegisterResponse registerCustomer(RegisterRequest request);
+    RegisterResponse registerArtist();
     RegisterResponse registerAdmin(AuthRequest request);
     LoginResponse login(AuthRequest request);
 }

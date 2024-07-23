@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class CreateMerchRequest {
+public class CreateProductRequest {
 
     @NotBlank(message = "name is required")
     private String name;

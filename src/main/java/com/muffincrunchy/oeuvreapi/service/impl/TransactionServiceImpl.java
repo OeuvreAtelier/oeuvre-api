@@ -1,6 +1,5 @@
 package com.muffincrunchy.oeuvreapi.service.impl;
 
-import com.muffincrunchy.oeuvreapi.model.constant.PaymentType;
 import com.muffincrunchy.oeuvreapi.model.dto.request.CreateTransactionRequest;
 import com.muffincrunchy.oeuvreapi.model.dto.response.TransactionDetailResponse;
 import com.muffincrunchy.oeuvreapi.model.dto.response.TransactionResponse;
@@ -21,10 +20,8 @@ public class TransactionServiceImpl implements TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final TransactionDetailService transactionDetailService;
-    private final CustomerService customerService;
-    private final MerchService merchService;
-    private final ShipmentService shipmentService;
-    private final PaymentService paymentService;
+    private final UserService userService;
+    private final ProductService productService;
     private final Validation validation;
 
     @Override
@@ -35,17 +32,14 @@ public class TransactionServiceImpl implements TransactionService {
                     List<TransactionDetailResponse> transactionDetailResponses = transaction.getTransactionDetails().stream().map(
                             transactionDetail -> TransactionDetailResponse.builder()
                                     .Id(transactionDetail.getId())
-                                    .merchId(transactionDetail.getMerch().getId())
-                                    .shipmentId(transactionDetail.getShipment().getId())
+                                    .merchId(transactionDetail.getProduct().getId())
                                     .merchPrice(transactionDetail.getMerchPrice())
-                                    .shipmentFee(transactionDetail.getShipmentFee())
                                     .qty(transactionDetail.getQty())
-                                    .payment(transactionDetail.getPayment().getPayment().toString())
                                     .build()
                     ).toList();
                     return TransactionResponse.builder()
                             .id(transaction.getId())
-                            .customerId(transaction.getCustomer().getId())
+                            .userId(transaction.getUser().getId())
                             .transDate(transaction.getTransDate())
                             .transactionDetails(transactionDetailResponses)
                             .build();
@@ -56,36 +50,31 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public TransactionResponse createTransaction(CreateTransactionRequest request) {
         validation.validate(request);
-        Customer customer = customerService.getById(request.getCustomerId());
+        User user = userService.getById(request.getUserId());
         Transaction transaction = Transaction.builder()
                 .id(UUID.randomUUID().toString())
-                .customer(customer)
+                .user(user)
                 .transDate(new Date())
                 .build();
         transactionRepository.createTransaction(
                 transaction.getId(),
-                transaction.getCustomer().getId(),
+                transaction.getUser().getId(),
                 transaction.getTransDate()
         );
 
         List<TransactionDetail> transactionDetails = request.getTransactionDetails().stream().map(
                 transactionDetail -> {
-                    Merch merch = merchService.getById(transactionDetail.getMerchId());
-                    Shipment shipment = shipmentService.getById(transactionDetail.getShipmentId());
-                    Payment payment = paymentService.getOrSave(PaymentType.valueOf(transactionDetail.getPayment()));
-                    if (merch.getStock() < transactionDetail.getQty()) {
+                    Product product = productService.getById(transactionDetail.getMerchId());
+                    if (product.getStock() < transactionDetail.getQty()) {
                         throw  new RuntimeException("Out of stock");
                     }
-                    merch.setStock(merch.getStock()-transactionDetail.getQty());
+                    product.setStock(product.getStock()-transactionDetail.getQty());
                     return TransactionDetail.builder()
                             .id(UUID.randomUUID().toString())
                             .transaction(transaction)
-                            .merch(merch)
-                            .shipment(shipment)
-                            .merchPrice(merch.getPrice())
-                            .shipmentFee(shipment.getFee())
+                            .product(product)
+                            .merchPrice(product.getPrice())
                             .qty(transactionDetail.getQty())
-                            .payment(payment)
                             .build();
                 }
         ).toList();
@@ -95,17 +84,14 @@ public class TransactionServiceImpl implements TransactionService {
         List<TransactionDetailResponse> transactionDetailResponses = transactionDetails.stream().map(
                 transactionDetail -> TransactionDetailResponse.builder()
                         .Id(transactionDetail.getId())
-                        .merchId(transactionDetail.getMerch().getId())
-                        .shipmentId(transactionDetail.getShipment().getId())
+                        .merchId(transactionDetail.getProduct().getId())
                         .merchPrice(transactionDetail.getMerchPrice())
-                        .shipmentFee(transactionDetail.getShipmentFee())
                         .qty(transactionDetail.getQty())
-                        .payment(transactionDetail.getPayment().getPayment().toString())
                         .build()
         ).toList();
         return TransactionResponse.builder()
                 .id(transaction.getId())
-                .customerId(transaction.getCustomer().getId())
+                .userId(transaction.getUser().getId())
                 .transDate(transaction.getTransDate())
                 .transactionDetails(transactionDetailResponses)
                 .build();

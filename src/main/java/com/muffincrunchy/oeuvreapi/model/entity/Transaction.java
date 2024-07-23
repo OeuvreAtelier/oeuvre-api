@@ -20,8 +20,8 @@ public class Transaction {
     private String id;
 
     @ManyToOne
-    @JoinColumn(name = "customer_id")
-    private Customer customer;
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "trans_date", updatable = false)
