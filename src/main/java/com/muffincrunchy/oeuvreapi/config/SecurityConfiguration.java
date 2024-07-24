@@ -30,11 +30,9 @@ public class SecurityConfiguration {
                 .sessionManagement(config -> config.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(req -> req.dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers("/api/v3/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET,"/api/v3/merchandises/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/v3/products/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 }
-
-

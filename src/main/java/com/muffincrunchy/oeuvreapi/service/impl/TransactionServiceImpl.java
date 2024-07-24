@@ -6,7 +6,7 @@ import com.muffincrunchy.oeuvreapi.model.dto.response.TransactionResponse;
 import com.muffincrunchy.oeuvreapi.model.entity.*;
 import com.muffincrunchy.oeuvreapi.repository.TransactionRepository;
 import com.muffincrunchy.oeuvreapi.service.*;
-import com.muffincrunchy.oeuvreapi.utils.Validation;
+import com.muffincrunchy.oeuvreapi.utils.validation.Validation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
