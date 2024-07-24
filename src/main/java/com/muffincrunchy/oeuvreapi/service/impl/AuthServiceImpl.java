@@ -4,7 +4,6 @@ import com.muffincrunchy.oeuvreapi.model.constant.UserGender;
 import com.muffincrunchy.oeuvreapi.model.constant.UserRole;
 import com.muffincrunchy.oeuvreapi.model.dto.request.AuthRequest;
 import com.muffincrunchy.oeuvreapi.model.dto.request.RegisterRequest;
-import com.muffincrunchy.oeuvreapi.model.dto.request.UpdateUserRequest;
 import com.muffincrunchy.oeuvreapi.model.dto.response.LoginResponse;
 import com.muffincrunchy.oeuvreapi.model.dto.response.RegisterResponse;
 import com.muffincrunchy.oeuvreapi.model.entity.User;

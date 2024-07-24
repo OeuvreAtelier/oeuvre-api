@@ -1,15 +1,17 @@
 package com.muffincrunchy.oeuvreapi.service;
 
 import com.muffincrunchy.oeuvreapi.model.dto.request.CreateProductRequest;
+import com.muffincrunchy.oeuvreapi.model.dto.request.PagingRequest;
+import com.muffincrunchy.oeuvreapi.model.dto.request.SearchProductRequest;
 import com.muffincrunchy.oeuvreapi.model.dto.request.UpdateProductRequest;
 import com.muffincrunchy.oeuvreapi.model.dto.response.ProductResponse;
 import com.muffincrunchy.oeuvreapi.model.entity.Product;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface ProductService {
 
-    List<ProductResponse> getAll();
+    Page<ProductResponse> getAll(PagingRequest pagingRequest);
+    Page<ProductResponse> getBySearch(PagingRequest pagingRequest, SearchProductRequest request);
     ProductResponse getResponseById(String id);
     Product getById(String id);
     ProductResponse create(CreateProductRequest request);

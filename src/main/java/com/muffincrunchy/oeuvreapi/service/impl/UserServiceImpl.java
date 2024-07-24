@@ -1,6 +1,8 @@
 package com.muffincrunchy.oeuvreapi.service.impl;
 
 import com.muffincrunchy.oeuvreapi.model.constant.UserGender;
+import com.muffincrunchy.oeuvreapi.model.dto.request.PagingRequest;
+import com.muffincrunchy.oeuvreapi.model.dto.request.SearchArtistRequest;
 import com.muffincrunchy.oeuvreapi.model.dto.request.UpdateUserRequest;
 import com.muffincrunchy.oeuvreapi.model.dto.response.UserResponse;
 import com.muffincrunchy.oeuvreapi.model.entity.User;
@@ -9,9 +11,12 @@ import com.muffincrunchy.oeuvreapi.repository.UserRepository;
 import com.muffincrunchy.oeuvreapi.service.GenderService;
 import com.muffincrunchy.oeuvreapi.service.UserService;
 import com.muffincrunchy.oeuvreapi.service.UserAccountService;
-import com.muffincrunchy.oeuvreapi.utils.Validation;
+import com.muffincrunchy.oeuvreapi.utils.validation.Validation;
+import com.muffincrunchy.oeuvreapi.utils.specification.UserSpecification;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -38,6 +43,22 @@ public class UserServiceImpl implements UserService {
     public List<UserResponse> getAll() {
         List<User> users = userRepository.findAll();
         return users.stream().map(this::parseToResponse).toList();
+    }
+
+    @Override
+    public Page<UserResponse> searchArtist(PagingRequest pagingRequest, SearchArtistRequest request) {
+        String sortBy = "displayName";
+        if (pagingRequest.getPage() <= 0) {
+            pagingRequest.setPage(1);
+        }
+        Sort sort = Sort.by(Sort.Direction.fromString(pagingRequest.getDirection()), sortBy);
+        Pageable pageable = PageRequest.of(pagingRequest.getPage()-1, pagingRequest.getSize(), sort);
+        Specification<User> specification = UserSpecification.getSpecification(request);
+        List<User> users = userRepository.findAll(specification);
+        List<UserResponse> userResponses = users.stream().map(this::parseToResponse).toList();
+        final int start = (int) pageable.getOffset();
+        final int end = Math.min(start + pageable.getPageSize(), userResponses.size());
+        return new PageImpl<>(userResponses.subList(start, end), pageable, userResponses.size());
     }
 
     @Override
@@ -106,5 +127,4 @@ public class UserServiceImpl implements UserService {
                 .userAccountId(userId)
                 .build();
     }
-
 }
