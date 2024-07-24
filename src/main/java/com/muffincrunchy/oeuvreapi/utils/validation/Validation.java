@@ -1,4 +1,4 @@
-package com.muffincrunchy.oeuvreapi.utils;
+package com.muffincrunchy.oeuvreapi.utils.validation;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;

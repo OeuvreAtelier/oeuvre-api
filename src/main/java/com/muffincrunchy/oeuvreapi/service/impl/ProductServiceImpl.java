@@ -3,6 +3,8 @@ package com.muffincrunchy.oeuvreapi.service.impl;
 import com.muffincrunchy.oeuvreapi.model.constant.ItemCategory;
 import com.muffincrunchy.oeuvreapi.model.constant.ItemType;
 import com.muffincrunchy.oeuvreapi.model.dto.request.CreateProductRequest;
+import com.muffincrunchy.oeuvreapi.model.dto.request.PagingRequest;
+import com.muffincrunchy.oeuvreapi.model.dto.request.SearchProductRequest;
 import com.muffincrunchy.oeuvreapi.model.dto.request.UpdateProductRequest;
 import com.muffincrunchy.oeuvreapi.model.dto.response.ProductResponse;
 import com.muffincrunchy.oeuvreapi.model.dto.response.UserResponse;
@@ -10,9 +12,12 @@ import com.muffincrunchy.oeuvreapi.model.entity.Product;
 import com.muffincrunchy.oeuvreapi.model.entity.User;
 import com.muffincrunchy.oeuvreapi.repository.ProductRepository;
 import com.muffincrunchy.oeuvreapi.service.*;
-import com.muffincrunchy.oeuvreapi.utils.Validation;
+import com.muffincrunchy.oeuvreapi.utils.specification.ProductSpecification;
+import com.muffincrunchy.oeuvreapi.utils.validation.Validation;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -38,9 +43,34 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductResponse> getAll() {
+    public Page<ProductResponse> getAll(PagingRequest pagingRequest) {
+        String sortBy = "name";
+        if (pagingRequest.getPage() <= 0) {
+            pagingRequest.setPage(1);
+        }
+        Sort sort = Sort.by(Sort.Direction.fromString(pagingRequest.getDirection()), sortBy);
+        Pageable pageable = PageRequest.of(pagingRequest.getPage()-1, pagingRequest.getSize(), sort);
         List<Product> products = productRepository.findAll();
-        return products.stream().map(this::parseProductToResponse).toList();
+        List<ProductResponse> productResponses = products.stream().map(this::parseProductToResponse).toList();
+        final int start = (int) pageable.getOffset();
+        final int end = Math.min(start + pageable.getPageSize(), productResponses.size());
+        return new PageImpl<>(productResponses.subList(start, end), pageable, productResponses.size());
+    }
+
+    @Override
+    public Page<ProductResponse> getBySearch(PagingRequest pagingRequest, SearchProductRequest request) {
+        String sortBy = "name";
+        if (pagingRequest.getPage() <= 0) {
+            pagingRequest.setPage(1);
+        }
+        Sort sort = Sort.by(Sort.Direction.fromString(pagingRequest.getDirection()), sortBy);
+        Pageable pageable = PageRequest.of(pagingRequest.getPage()-1, pagingRequest.getSize(), sort);
+        Specification<Product> specification = ProductSpecification.getSpecification(request);
+        List<Product> products = productRepository.findAll(specification);
+        List<ProductResponse> productResponses = products.stream().map(this::parseProductToResponse).toList();
+        final int start = (int) pageable.getOffset();
+        final int end = Math.min(start + pageable.getPageSize(), productResponses.size());
+        return new PageImpl<>(productResponses.subList(start, end), pageable, productResponses.size());
     }
 
     @Override
