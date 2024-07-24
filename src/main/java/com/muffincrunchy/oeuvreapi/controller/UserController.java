@@ -26,9 +26,9 @@ public class UserController {
 
     private final UserService userService;
 
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping
-    public ResponseEntity<CommonResponse<List<UserResponse>>> getMerch() {
+    public ResponseEntity<CommonResponse<List<UserResponse>>> getUser() {
         List<UserResponse> artists = userService.getAll();
         CommonResponse<List<UserResponse>> response = CommonResponse.<List<UserResponse>>builder()
                 .statusCode(HttpStatus.OK.value())
@@ -74,7 +74,7 @@ public class UserController {
     }
 
     @GetMapping(ID_PATH)
-    public ResponseEntity<CommonResponse<User>> getArtistById(@PathVariable("id") String id) {
+    public ResponseEntity<CommonResponse<User>> getUserById(@PathVariable("id") String id) {
         User user = userService.getById(id);
         CommonResponse<User> response = CommonResponse.<User>builder()
                 .statusCode(HttpStatus.OK.value())
@@ -84,9 +84,9 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/user/{user_id}")
-    public ResponseEntity<CommonResponse<User>> getArtistByUserId(@PathVariable("user_id") String userId) {
-        User user = userService.getByUserAccountId(userId);
+    @GetMapping("/account/{user_account_id}")
+    public ResponseEntity<CommonResponse<User>> getUserByUserAccountId(@PathVariable("user_account_id") String userAccountId) {
+        User user = userService.getByUserAccountId(userAccountId);
         CommonResponse<User> response = CommonResponse.<User>builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("success fetch data")

@@ -111,7 +111,7 @@ public class ProductServiceImpl implements ProductService {
                 .category(categoryService.getOrSave(ItemCategory.valueOf(request.getCategory())))
                 .price(request.getPrice())
                 .stock(request.getStock())
-                .user(userService.getById(request.getArtistId()))
+                .user(userService.getById(request.getUserId()))
                 .type(typeService.getOrSave(ItemType.valueOf(request.getType())))
                 .createdAt(new Date())
                 .updatedAt(new Date())
