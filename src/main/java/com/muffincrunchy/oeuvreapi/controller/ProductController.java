@@ -20,7 +20,7 @@ import static com.muffincrunchy.oeuvreapi.model.constant.ApiUrl.*;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(MERCH_URL)
+@RequestMapping(PRODUCT_URL)
 public class ProductController {
 
     private final ProductService productService;
@@ -98,6 +98,38 @@ public class ProductController {
                 .statusCode(HttpStatus.OK.value())
                 .message("success fetch data")
                 .data(product)
+                .build();
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/artist/{id}")
+    public ResponseEntity<CommonResponse<List<ProductResponse>>> getProductsByArtist(
+            @PathVariable("id") String id,
+            @RequestParam(name = "page", defaultValue = "1") Integer page,
+            @RequestParam(name = "size", defaultValue = "24") Integer size,
+            @RequestParam(name = "sortBy", defaultValue = "name") String sortBy,
+            @RequestParam(name = "direction", defaultValue = "asc") String direction
+    ) {
+        PagingRequest pagingRequest = PagingRequest.builder()
+                .page(page)
+                .size(size)
+                .sortBy(sortBy)
+                .direction(direction)
+                .build();
+        Page<ProductResponse> products = productService.getByUser(pagingRequest, id);
+        PagingResponse pagingResponse = PagingResponse.builder()
+                .totalPages(products.getTotalPages())
+                .totalElements(products.getTotalElements())
+                .page(products.getPageable().getPageNumber()+1)
+                .size(products.getPageable().getPageSize())
+                .hasNext(products.hasNext())
+                .hasPrevious(products.hasPrevious())
+                .build();
+        CommonResponse<List<ProductResponse>> response = CommonResponse.<List<ProductResponse>>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("success fetch data")
+                .data(products.getContent())
+                .paging(pagingResponse)
                 .build();
         return ResponseEntity.ok(response);
     }

@@ -12,6 +12,7 @@ public interface ProductService {
 
     Page<ProductResponse> getAll(PagingRequest pagingRequest);
     Page<ProductResponse> getBySearch(PagingRequest pagingRequest, SearchProductRequest request);
+    Page<ProductResponse> getByUser(PagingRequest pagingRequest, String userId);
     ProductResponse getResponseById(String id);
     Product getById(String id);
     ProductResponse create(CreateProductRequest request);

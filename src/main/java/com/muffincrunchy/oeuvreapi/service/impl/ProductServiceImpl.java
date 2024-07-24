@@ -74,6 +74,21 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public Page<ProductResponse> getByUser(PagingRequest pagingRequest, String userId) {
+        String sortBy = "name";
+        if (pagingRequest.getPage() <= 0) {
+            pagingRequest.setPage(1);
+        }
+        Sort sort = Sort.by(Sort.Direction.fromString(pagingRequest.getDirection()), sortBy);
+        Pageable pageable = PageRequest.of(pagingRequest.getPage()-1, pagingRequest.getSize(), sort);
+        List<Product> products = productRepository.findAllByUserId(userId);
+        List<ProductResponse> productResponses = products.stream().map(this::parseProductToResponse).toList();
+        final int start = (int) pageable.getOffset();
+        final int end = Math.min(start + pageable.getPageSize(), productResponses.size());
+        return new PageImpl<>(productResponses.subList(start, end), pageable, productResponses.size());
+    }
+
+    @Override
     public Product getById(String id) {
         return productRepository.findById(id).orElse(null);
     }

@@ -21,7 +21,7 @@ import static com.muffincrunchy.oeuvreapi.model.constant.ApiUrl.*;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(ARTIST_URL)
+@RequestMapping(USER_URL)
 public class UserController {
 
     private final UserService userService;
