@@ -1,7 +1,10 @@
 package com.muffincrunchy.oeuvreapi.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.Date;
 
 @Getter
 @Setter
@@ -36,4 +39,14 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "type")
     private Type type;
+
+    @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
+    private Date createdAt;
+
+    @Column(name = "updated_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
+    private Date updatedAt;
 }

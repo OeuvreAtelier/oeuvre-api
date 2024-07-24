@@ -20,6 +20,7 @@ import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -112,6 +113,8 @@ public class ProductServiceImpl implements ProductService {
                 .stock(request.getStock())
                 .user(userService.getById(request.getArtistId()))
                 .type(typeService.getOrSave(ItemType.valueOf(request.getType())))
+                .createdAt(new Date())
+                .updatedAt(new Date())
                 .build();
         productRepository.saveAndFlush(product);
         return parseProductToResponse(product);
@@ -126,6 +129,7 @@ public class ProductServiceImpl implements ProductService {
         product.setPrice(request.getPrice());
         product.setStock(request.getStock());
         product.setType(typeService.getOrSave(ItemType.valueOf(request.getType())));
+        product.setUpdatedAt(new Date());
         productRepository.saveAndFlush(product);
         return parseProductToResponse(product);
     }
@@ -144,6 +148,8 @@ public class ProductServiceImpl implements ProductService {
                 .user(parseUserToResponse(product.getUser()))
                 .category(product.getCategory().getCategory().toString())
                 .type(product.getType().getType().toString())
+                .createdAt(product.getCreatedAt())
+                .updatedAt(product.getUpdatedAt())
                 .build();
     }
 
@@ -159,6 +165,8 @@ public class ProductServiceImpl implements ProductService {
                 .phoneNumber(user.getPhoneNumber())
                 .isArtist(user.isArtist())
                 .userAccountId(user.getUserAccount().getId())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
                 .build();
     }
 }

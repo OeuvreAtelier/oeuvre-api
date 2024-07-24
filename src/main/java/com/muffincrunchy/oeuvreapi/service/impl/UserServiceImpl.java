@@ -21,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Date;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -69,6 +70,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public User create(User request) {
         validation.validate(request);
+        request.setCreatedAt(new Date());
+        request.setUpdatedAt(new Date());
         return userRepository.saveAndFlush(request);
     }
 
@@ -87,6 +90,7 @@ public class UserServiceImpl implements UserService {
         user.setGender(genderService.getOrSave(UserGender.valueOf(request.getGender())));
         user.setBirthDate(request.getBirthDate());
         user.setPhoneNumber(request.getPhoneNumber());
+        user.setUpdatedAt(new Date());
         userRepository.saveAndFlush(user);
         return parseToResponse(user);
     }
@@ -125,6 +129,8 @@ public class UserServiceImpl implements UserService {
                 .phoneNumber(user.getPhoneNumber())
                 .isArtist(user.isArtist())
                 .userAccountId(userId)
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
                 .build();
     }
 }
