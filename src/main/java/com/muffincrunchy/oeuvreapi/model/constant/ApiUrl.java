@@ -9,5 +9,5 @@ public class ApiUrl {
     public static final String AUTH_URL = BASE_URL + "/auth";
     public static final String ID_PATH = "/{id}";
     public static final String SEARCH_PATH = "/search";
-    public static final String PRODUCT_IMG_URL = "/api/v3/products/images/";
+    public static final String PRODUCT_IMG_URL = BASE_URL + "/images/";
 }

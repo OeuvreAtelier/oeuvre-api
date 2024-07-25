@@ -42,5 +42,9 @@ public class UpdateUserRequest {
     @JsonProperty("phone_number")
     private String phoneNumber;
 
+    private String description;
+
+    private String pixiv;
+
     private MultipartFile image;
 }
