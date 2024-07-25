@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 
@@ -40,4 +41,6 @@ public class UpdateUserRequest {
     @NotBlank(message = "phone_number is required")
     @JsonProperty("phone_number")
     private String phoneNumber;
+
+    private MultipartFile image;
 }

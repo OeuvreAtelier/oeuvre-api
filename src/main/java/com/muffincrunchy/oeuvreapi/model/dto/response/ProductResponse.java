@@ -18,4 +18,5 @@ public class ProductResponse {
     private String type;
     private Date createdAt;
     private Date updatedAt;
+    private ImageResponse image;
 }
