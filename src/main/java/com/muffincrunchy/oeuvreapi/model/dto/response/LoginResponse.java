@@ -8,7 +8,6 @@ import java.util.List;
 @Data
 @Builder
 public class LoginResponse {
-    private String id;
     private String username;
     private String token;
     private List<String> roles;

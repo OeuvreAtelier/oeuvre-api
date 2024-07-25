@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @Builder
@@ -22,10 +23,12 @@ public class CreateProductRequest {
     @NotNull(message = "stock is required")
     private Integer stock;
 
-    @NotBlank(message = "artist_id is required")
-    @JsonProperty("artist_id")
-    private String artistId;
+    @NotBlank(message = "user_id is required")
+    @JsonProperty("user_id")
+    private String userId;
 
     @NotBlank(message = "type is required")
     private String type;
+
+    private MultipartFile image;
 }

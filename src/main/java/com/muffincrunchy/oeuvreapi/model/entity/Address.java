@@ -12,33 +12,34 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "products")
-public class Product {
+@Table(name = "addresses")
+public class Address {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Column(name = "name")
-    private String name;
-
-    @Column(name = "price")
-    private Long price;
-
-    @Column(name = "stock")
-    private Integer stock;
-
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "category")
-    private Category category;
+    @Column(name = "country")
+    private String country;
 
-    @ManyToOne
-    @JoinColumn(name = "type")
-    private Type type;
+    @Column(name = "state")
+    private String state;
+
+    @Column(name = "city")
+    private String city;
+
+    @Column(name = "detail")
+    private String detail;
+
+    @Column(name = "postal_code")
+    private String postalCode;
+
+    @Column(name = "phone_number")
+    private String phoneNumber;
 
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)
@@ -49,8 +50,4 @@ public class Product {
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
     private Date updatedAt;
-
-    @OneToOne
-    @JoinColumn(name = "image_id")
-    private Image image;
 }

@@ -7,16 +7,16 @@ import java.util.Date;
 
 @Data
 @Builder
-public class ProductResponse {
+public class AddressResponse {
 
     private String id;
-    private String name;
-    private Long price;
-    private Integer stock;
     private UserResponse user;
-    private String category;
-    private String type;
+    private String country;
+    private String state;
+    private String city;
+    private String detail;
+    private String postalCode;
+    private String phoneNumber;
     private Date createdAt;
     private Date updatedAt;
-    private ImageResponse image;
 }

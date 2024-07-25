@@ -41,10 +41,10 @@ public class AuthServiceImpl implements AuthService {
 
     private final AuthenticationManager authenticationManager;
 
-    @Value("${booth-art.admin.username}")
+    @Value("${oeuvre.admin.username}")
     private String adminUsername;
 
-    @Value("${booth-art.admin.password}")
+    @Value("${oeuvre.admin.password}")
     private String adminPassword;
 
     @PostConstruct
@@ -133,7 +133,6 @@ public class AuthServiceImpl implements AuthService {
         UserAccount userAccount = (UserAccount) authenticated.getPrincipal();
         String token = jwtService.generateToken(userAccount);
         return LoginResponse.builder()
-                .id(userAccount.getId())
                 .token(token)
                 .username(userAccount.getUsername())
                 .roles(userAccount.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList())

@@ -1,5 +1,7 @@
 package com.muffincrunchy.oeuvreapi.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.muffincrunchy.oeuvreapi.model.dto.request.PagingRequest;
 import com.muffincrunchy.oeuvreapi.model.dto.request.SearchArtistRequest;
 import com.muffincrunchy.oeuvreapi.model.dto.request.UpdateUserRequest;
@@ -9,11 +11,14 @@ import com.muffincrunchy.oeuvreapi.model.dto.response.CommonResponse;
 import com.muffincrunchy.oeuvreapi.model.entity.User;
 import com.muffincrunchy.oeuvreapi.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -24,11 +29,13 @@ import static com.muffincrunchy.oeuvreapi.model.constant.ApiUrl.*;
 @RequestMapping(USER_URL)
 public class UserController {
 
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private final UserService userService;
+    private final ObjectMapper objectMapper;
 
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping
-    public ResponseEntity<CommonResponse<List<UserResponse>>> getMerch() {
+    public ResponseEntity<CommonResponse<List<UserResponse>>> getUser() {
         List<UserResponse> artists = userService.getAll();
         CommonResponse<List<UserResponse>> response = CommonResponse.<List<UserResponse>>builder()
                 .statusCode(HttpStatus.OK.value())
@@ -74,9 +81,9 @@ public class UserController {
     }
 
     @GetMapping(ID_PATH)
-    public ResponseEntity<CommonResponse<User>> getArtistById(@PathVariable("id") String id) {
-        User user = userService.getById(id);
-        CommonResponse<User> response = CommonResponse.<User>builder()
+    public ResponseEntity<CommonResponse<UserResponse>> getUserById(@PathVariable("id") String id) {
+        UserResponse user = userService.getResponseById(id);
+        CommonResponse<UserResponse> response = CommonResponse.<UserResponse>builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("success fetch data")
                 .data(user)
@@ -84,9 +91,9 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/user/{user_id}")
-    public ResponseEntity<CommonResponse<User>> getArtistByUserId(@PathVariable("user_id") String userId) {
-        User user = userService.getByUserAccountId(userId);
+    @GetMapping("/account/{user_account_id}")
+    public ResponseEntity<CommonResponse<User>> getUserByUserAccountId(@PathVariable("user_account_id") String userAccountId) {
+        User user = userService.getByUserAccountId(userAccountId);
         CommonResponse<User> response = CommonResponse.<User>builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("success fetch data")
@@ -107,14 +114,22 @@ public class UserController {
 //    }
 
     @PutMapping
-    public ResponseEntity<CommonResponse<UserResponse>> updateArtist(@RequestBody UpdateUserRequest request) {
-        UserResponse artist = userService.update(request);
-        CommonResponse<UserResponse> response = CommonResponse.<UserResponse>builder()
-                .statusCode(HttpStatus.OK.value())
-                .message("success update data")
-                .data(artist)
-                .build();
-        return ResponseEntity.ok(response);
+    public ResponseEntity<CommonResponse<?>> updateUser(@RequestPart(name = "user") String user, @RequestPart(name = "image") MultipartFile image) {
+        CommonResponse.CommonResponseBuilder<UserResponse> responseBuilder = CommonResponse.builder();
+        try {
+            UpdateUserRequest request = objectMapper.readValue(user, new TypeReference<>() {
+            });
+            request.setImage(image);
+            UserResponse response = userService.update(request);
+            responseBuilder.statusCode(HttpStatus.CREATED.value());
+            responseBuilder.message("success save data");
+            responseBuilder.data(response);
+            return ResponseEntity.status(HttpStatus.CREATED).body(responseBuilder.build());
+        } catch (Exception e) {
+            responseBuilder.message("internal server error");
+            responseBuilder.statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseBuilder.build());
+        }
     }
 
     @DeleteMapping(value = ID_PATH)
