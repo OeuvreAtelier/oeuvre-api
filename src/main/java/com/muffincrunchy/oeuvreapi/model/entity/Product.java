@@ -49,4 +49,8 @@ public class Product {
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
     private Date updatedAt;
+
+    @OneToOne
+    @JoinColumn(name = "image_id")
+    private Image image;
 }

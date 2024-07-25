@@ -14,6 +14,7 @@ public interface UserService {
     List<UserResponse> getAll();
     Page<UserResponse> searchArtist(PagingRequest pagingRequest, SearchArtistRequest request);
     User getById(String id);
+    UserResponse getResponseById(String id);
     User create(User request);
     UserResponse update(UpdateUserRequest request);
     void delete(String id);

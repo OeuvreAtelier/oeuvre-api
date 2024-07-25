@@ -7,7 +7,7 @@ public enum ItemCategory {
     AUDIO("Audio"),
     COSPLAY("Cosplay"),
     FASHION("Fashion"),
-    FIGURES("Figures"),
+    FIGURES("Figures, Plushies, & Dolls"),
     GAMES("Games"),
     GOODS("Goods"),
     ILLUSTRATION("Illustration"),

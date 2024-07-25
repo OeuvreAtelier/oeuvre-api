@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @Builder
@@ -28,4 +29,6 @@ public class CreateProductRequest {
 
     @NotBlank(message = "type is required")
     private String type;
+
+    private MultipartFile image;
 }

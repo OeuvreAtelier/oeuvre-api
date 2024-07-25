@@ -1,5 +1,7 @@
 package com.muffincrunchy.oeuvreapi.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.muffincrunchy.oeuvreapi.model.dto.request.CreateProductRequest;
 import com.muffincrunchy.oeuvreapi.model.dto.request.PagingRequest;
 import com.muffincrunchy.oeuvreapi.model.dto.request.SearchProductRequest;
@@ -9,21 +11,25 @@ import com.muffincrunchy.oeuvreapi.model.dto.response.PagingResponse;
 import com.muffincrunchy.oeuvreapi.model.dto.response.ProductResponse;
 import com.muffincrunchy.oeuvreapi.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 import static com.muffincrunchy.oeuvreapi.model.constant.ApiUrl.*;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(PRODUCT_URL)
 public class ProductController {
 
     private final ProductService productService;
+    private final ObjectMapper objectMapper;
 
     @GetMapping
     public ResponseEntity<CommonResponse<List<ProductResponse>>> getProducts(
@@ -135,25 +141,39 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<CommonResponse<ProductResponse>> createProduct(@RequestBody CreateProductRequest request) {
-        ProductResponse product = productService.create(request);
-        CommonResponse<ProductResponse> response = CommonResponse.<ProductResponse>builder()
-                .statusCode(HttpStatus.OK.value())
-                .message("success save data")
-                .data(product)
-                .build();
-        return ResponseEntity.ok(response);
+    public ResponseEntity<CommonResponse<?>> createProduct(@RequestPart(name = "product") String product, @RequestPart(name = "image") MultipartFile image) {
+        CommonResponse.CommonResponseBuilder<ProductResponse> responseBuilder = CommonResponse.builder();
+        try {
+            CreateProductRequest request = objectMapper.readValue(product, new TypeReference<>() {});
+            request.setImage(image);
+            ProductResponse response = productService.create(request);
+            responseBuilder.statusCode(HttpStatus.CREATED.value());
+            responseBuilder.message("success save data");
+            responseBuilder.data(response);
+            return ResponseEntity.status(HttpStatus.CREATED).body(responseBuilder.build());
+        } catch (Exception e) {
+            responseBuilder.message("internal server error");
+            responseBuilder.statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseBuilder.build());
+        }
     }
 
     @PutMapping
-    public ResponseEntity<CommonResponse<ProductResponse>> updateProduct(@RequestBody UpdateProductRequest request) {
-        ProductResponse product = productService.update(request);
-        CommonResponse<ProductResponse> response = CommonResponse.<ProductResponse>builder()
-                .statusCode(HttpStatus.OK.value())
-                .message("success update data")
-                .data(product)
-                .build();
-        return ResponseEntity.ok(response);
+    public ResponseEntity<CommonResponse<?>> updateProduct(@RequestPart(name = "product") String product, @RequestPart(name = "image") MultipartFile image) {
+        CommonResponse.CommonResponseBuilder<ProductResponse> responseBuilder = CommonResponse.builder();
+        try {
+            UpdateProductRequest request = objectMapper.readValue(product, new TypeReference<>() {});
+            request.setImage(image);
+            ProductResponse response = productService.update(request);
+            responseBuilder.statusCode(HttpStatus.CREATED.value());
+            responseBuilder.message("success save data");
+            responseBuilder.data(response);
+            return ResponseEntity.status(HttpStatus.CREATED).body(responseBuilder.build());
+        } catch (Exception e) {
+            responseBuilder.message("internal server error");
+            responseBuilder.statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseBuilder.build());
+        }
     }
 
     @DeleteMapping(value = ID_PATH)

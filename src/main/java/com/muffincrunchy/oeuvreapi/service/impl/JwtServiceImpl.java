@@ -24,9 +24,9 @@ public class JwtServiceImpl implements JwtService {
     private final long JWT_EXPIRATION;
 
     public JwtServiceImpl(
-            @Value("${booth-art.jwt.secret_key}") String jwtSecret,
-            @Value("${booth-art.jwt.issuer}") String issuer,
-            @Value("${booth-art.jwt.expirationInSecond}") long expiration
+            @Value("${oeuvre.jwt.secret_key}") String jwtSecret,
+            @Value("${oeuvre.jwt.issuer}") String issuer,
+            @Value("${oeuvre.jwt.expirationInSecond}") long expiration
     ) {
         JWT_SECRET = jwtSecret;
         ISSUER = issuer;

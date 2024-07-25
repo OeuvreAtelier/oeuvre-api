@@ -22,4 +22,5 @@ public class UserResponse {
     private String userAccountId;
     private Date createdAt;
     private Date updatedAt;
+    private ImageResponse image;
 }
