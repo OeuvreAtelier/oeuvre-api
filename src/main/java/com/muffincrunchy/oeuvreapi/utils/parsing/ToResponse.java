@@ -3,7 +3,7 @@ package com.muffincrunchy.oeuvreapi.utils.parsing;
 import com.muffincrunchy.oeuvreapi.model.dto.response.*;
 import com.muffincrunchy.oeuvreapi.model.entity.*;
 
-import static com.muffincrunchy.oeuvreapi.model.constant.ApiUrl.PRODUCT_IMG_URL;
+import static com.muffincrunchy.oeuvreapi.model.constant.ApiUrl.IMG_URL;
 
 public class ToResponse {
 
@@ -53,9 +53,25 @@ public class ToResponse {
     }
 
     public static ProductResponse parseProduct(Product product) {
-        ProductDescriptionResponse productDescriptionResponse = null;
+        ProductDescriptionResponse description = null;
+        ImageResponse image = null;
+        String category = null;
+        String type = null;
         if (product.getDescription() != null) {
-            productDescriptionResponse = parseProductDescription(product.getDescription());
+            description = parseProductDescription(product.getDescription());
+        }
+        if (product.getImage() != null) {
+            image = ImageResponse.builder()
+                    .url(IMG_URL + product.getImage().getId())
+                    .path(product.getImage().getPath())
+                    .name(product.getImage().getName())
+                    .build();
+        }
+        if (product.getCategory() != null) {
+            category = product.getCategory().getCategory().toString();
+        }
+        if (product.getType() != null) {
+            type = product.getType().getType().toString();
         }
         return ProductResponse.builder()
                 .id(product.getId())
@@ -63,35 +79,35 @@ public class ToResponse {
                 .price(product.getPrice())
                 .stock(product.getStock())
                 .user(parseUser(product.getUser()))
-                .category(product.getCategory().getCategory().toString())
-                .type(product.getType().getType().toString())
-                .description(productDescriptionResponse)
+                .category(category)
+                .type(type)
+                .description(description)
                 .createdAt(product.getCreatedAt())
                 .updatedAt(product.getUpdatedAt())
-                .image(ImageResponse.builder()
-                        .url(PRODUCT_IMG_URL + product.getImage().getId())
-                        .path(product.getImage().getPath())
-                        .name(product.getImage().getName())
-                        .build())
+                .image(image)
                 .build();
     }
 
     public static UserResponse parseUser(User user){
         String userId = null;
-        ImageResponse imageResponse = null;
-        UserDescriptionResponse userDescriptionResponse = null;
+        String gender = null;
+        ImageResponse image = null;
+        UserDescriptionResponse description = null;
         if(user.getUserAccount() != null){
             userId = user.getUserAccount().getId();
         }
+        if (user.getGender() != null) {
+            gender = user.getGender().getGender().toString();
+        }
         if (user.getImage() != null) {
-            imageResponse = ImageResponse.builder()
-                    .url(PRODUCT_IMG_URL + user.getImage().getId())
+            image = ImageResponse.builder()
+                    .url(IMG_URL + user.getImage().getId())
                     .path(user.getImage().getPath())
                     .name(user.getImage().getName())
                     .build();
         }
         if (user.getDescription() != null) {
-            userDescriptionResponse = parseUserDescription(user.getDescription());
+            description = parseUserDescription(user.getDescription());
         }
         return UserResponse.builder()
                 .id(user.getId())
@@ -99,15 +115,15 @@ public class ToResponse {
                 .lastName(user.getLastName())
                 .displayName(user.getDisplayName())
                 .email(user.getEmail())
-                .gender(user.getGender().getGender().toString())
+                .gender(gender)
                 .birthDate(user.getBirthDate())
                 .phoneNumber(user.getPhoneNumber())
-                .description(userDescriptionResponse)
+                .description(description)
                 .isArtist(user.isArtist())
                 .userAccountId(userId)
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
-                .image(imageResponse)
+                .image(image)
                 .build();
     }
 }
