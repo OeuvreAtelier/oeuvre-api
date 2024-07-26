@@ -10,6 +10,7 @@ import com.muffincrunchy.oeuvreapi.service.UserService;
 import com.muffincrunchy.oeuvreapi.utils.parsing.ToResponse;
 import com.muffincrunchy.oeuvreapi.utils.validation.Validation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -61,7 +62,7 @@ public class ProductReviewServiceImpl implements ProductReviewService {
         validation.validate(request);
         ProductReview productReview = ProductReview.builder()
                 .product(productService.getById(request.getProductId()))
-                .user(userService.getById(request.getProductId()))
+                .user(userService.getById(request.getUserId()))
                 .rating(request.getRating())
                 .review(request.getReview())
                 .createdAt(new Date())

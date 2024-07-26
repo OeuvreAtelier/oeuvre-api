@@ -112,7 +112,7 @@ public class UserServiceImpl implements UserService {
         user.setGender(genderService.getOrSave(UserGender.valueOf(request.getGender())));
         user.setBirthDate(request.getBirthDate());
         user.setPhoneNumber(request.getPhoneNumber());
-        if (!request.getDescription().isEmpty()) {
+        if (!request.getDescription().isEmpty() || !request.getPixiv().isEmpty()) {
             if (user.getDescription() == null) {
                 user.setDescription(
                         userDescriptionService.create(UserDescription.builder()
