@@ -35,8 +35,8 @@ public class ProductController {
     public ResponseEntity<CommonResponse<List<ProductResponse>>> getProducts(
             @RequestParam(name = "page", defaultValue = "1") Integer page,
             @RequestParam(name = "size", defaultValue = "24") Integer size,
-            @RequestParam(name = "sortBy", defaultValue = "name") String sortBy,
-            @RequestParam(name = "direction", defaultValue = "asc") String direction
+            @RequestParam(name = "sortBy", defaultValue = "updatedAt") String sortBy,
+            @RequestParam(name = "direction", defaultValue = "desc") String direction
     ) {
         PagingRequest pagingRequest = PagingRequest.builder()
                 .page(page)
@@ -66,8 +66,8 @@ public class ProductController {
     public ResponseEntity<CommonResponse<List<ProductResponse>>> searchProducts(
             @RequestParam(name = "page", defaultValue = "1") Integer page,
             @RequestParam(name = "size", defaultValue = "24") Integer size,
-            @RequestParam(name = "sortBy", defaultValue = "name") String sortBy,
-            @RequestParam(name = "direction", defaultValue = "asc") String direction,
+            @RequestParam(name = "sortBy", defaultValue = "updatedAt") String sortBy,
+            @RequestParam(name = "direction", defaultValue = "desc") String direction,
             @RequestParam(name = "name", required = false) String name
     ) {
         SearchProductRequest request = SearchProductRequest.builder()
@@ -113,8 +113,8 @@ public class ProductController {
             @PathVariable("id") String id,
             @RequestParam(name = "page", defaultValue = "1") Integer page,
             @RequestParam(name = "size", defaultValue = "24") Integer size,
-            @RequestParam(name = "sortBy", defaultValue = "name") String sortBy,
-            @RequestParam(name = "direction", defaultValue = "asc") String direction
+            @RequestParam(name = "sortBy", defaultValue = "updatedAt") String sortBy,
+            @RequestParam(name = "direction", defaultValue = "desc") String direction
     ) {
         PagingRequest pagingRequest = PagingRequest.builder()
                 .page(page)

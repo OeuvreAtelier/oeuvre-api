@@ -49,11 +49,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Page<ProductResponse> getAll(PagingRequest pagingRequest) {
-        String sortBy = "updatedAt";
         if (pagingRequest.getPage() <= 0) {
             pagingRequest.setPage(1);
         }
-        Sort sort = Sort.by(Sort.Direction.fromString(pagingRequest.getDirection()), sortBy);
+        Sort sort = Sort.by(Sort.Direction.fromString(pagingRequest.getDirection()), pagingRequest.getSortBy());
         Pageable pageable = PageRequest.of(pagingRequest.getPage()-1, pagingRequest.getSize(), sort);
         List<Product> products = productRepository.findAll();
         List<ProductResponse> productResponses = products.stream().map(ToResponse::parseProduct).toList();
@@ -64,11 +63,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Page<ProductResponse> getBySearch(PagingRequest pagingRequest, SearchProductRequest request) {
-        String sortBy = "updatedAt";
         if (pagingRequest.getPage() <= 0) {
             pagingRequest.setPage(1);
         }
-        Sort sort = Sort.by(Sort.Direction.fromString(pagingRequest.getDirection()), sortBy);
+        Sort sort = Sort.by(Sort.Direction.fromString(pagingRequest.getDirection()), pagingRequest.getSortBy());
         Pageable pageable = PageRequest.of(pagingRequest.getPage()-1, pagingRequest.getSize(), sort);
         Specification<Product> specification = ProductSpecification.getSpecification(request);
         List<Product> products = productRepository.findAll(specification);
@@ -80,11 +78,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Page<ProductResponse> getByUser(PagingRequest pagingRequest, String userId) {
-        String sortBy = "updatedAt";
         if (pagingRequest.getPage() <= 0) {
             pagingRequest.setPage(1);
         }
-        Sort sort = Sort.by(Sort.Direction.fromString(pagingRequest.getDirection()), sortBy);
+        Sort sort = Sort.by(Sort.Direction.fromString(pagingRequest.getDirection()), pagingRequest.getSortBy());
         Pageable pageable = PageRequest.of(pagingRequest.getPage()-1, pagingRequest.getSize(), sort);
         List<Product> products = productRepository.findAllByUserId(userId);
         List<ProductResponse> productResponses = products.stream().map(ToResponse::parseProduct).toList();

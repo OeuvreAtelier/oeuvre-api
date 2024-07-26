@@ -1,6 +1,7 @@
 package com.muffincrunchy.oeuvreapi.service.impl;
 
 import com.muffincrunchy.oeuvreapi.model.dto.request.CreateProductReviewRequest;
+import com.muffincrunchy.oeuvreapi.model.dto.request.PagingRequest;
 import com.muffincrunchy.oeuvreapi.model.dto.response.ProductReviewResponse;
 import com.muffincrunchy.oeuvreapi.model.entity.ProductReview;
 import com.muffincrunchy.oeuvreapi.repository.ProductReviewRepository;
@@ -11,6 +12,7 @@ import com.muffincrunchy.oeuvreapi.utils.parsing.ToResponse;
 import com.muffincrunchy.oeuvreapi.utils.validation.Validation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -32,15 +34,31 @@ public class ProductReviewServiceImpl implements ProductReviewService {
     }
 
     @Override
-    public List<ProductReviewResponse> getByProductId(String productId) {
+    public Page<ProductReviewResponse> getByProductId(PagingRequest pagingRequest, String productId) {
+        if (pagingRequest.getPage() <= 0) {
+            pagingRequest.setPage(1);
+        }
+        Sort sort = Sort.by(Sort.Direction.fromString(pagingRequest.getDirection()), pagingRequest.getSortBy());
+        Pageable pageable = PageRequest.of(pagingRequest.getPage()-1, pagingRequest.getSize(), sort);
         List<ProductReview> productReviews = productReviewRepository.findAllByProductId(productId);
-        return productReviews.stream().map(ToResponse::parseProductReview).toList();
+        List<ProductReviewResponse> productReviewResponses = productReviews.stream().map(ToResponse::parseProductReview).toList();
+        final int start = (int) pageable.getOffset();
+        final int end = Math.min(start + pageable.getPageSize(), productReviewResponses.size());
+        return new PageImpl<>(productReviewResponses.subList(start, end), pageable, productReviewResponses.size());
     }
 
     @Override
-    public List<ProductReviewResponse> getByUserID(String userId) {
+    public Page<ProductReviewResponse> getByUserID(PagingRequest pagingRequest, String userId) {
+        if (pagingRequest.getPage() <= 0) {
+            pagingRequest.setPage(1);
+        }
+        Sort sort = Sort.by(Sort.Direction.fromString(pagingRequest.getDirection()), pagingRequest.getSortBy());
+        Pageable pageable = PageRequest.of(pagingRequest.getPage()-1, pagingRequest.getSize(), sort);
         List<ProductReview> productReviews = productReviewRepository.findAllByUserId(userId);
-        return productReviews.stream().map(ToResponse::parseProductReview).toList();
+        List<ProductReviewResponse> productReviewResponses = productReviews.stream().map(ToResponse::parseProductReview).toList();
+        final int start = (int) pageable.getOffset();
+        final int end = Math.min(start + pageable.getPageSize(), productReviewResponses.size());
+        return new PageImpl<>(productReviewResponses.subList(start, end), pageable, productReviewResponses.size());
     }
 
     @Override

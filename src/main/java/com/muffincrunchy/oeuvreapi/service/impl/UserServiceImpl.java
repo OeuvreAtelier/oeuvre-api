@@ -50,11 +50,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<UserResponse> searchArtist(PagingRequest pagingRequest, SearchArtistRequest request) {
-        String sortBy = "displayName";
         if (pagingRequest.getPage() <= 0) {
             pagingRequest.setPage(1);
         }
-        Sort sort = Sort.by(Sort.Direction.fromString(pagingRequest.getDirection()), sortBy);
+        Sort sort = Sort.by(Sort.Direction.fromString(pagingRequest.getDirection()), pagingRequest.getSortBy());
         Pageable pageable = PageRequest.of(pagingRequest.getPage()-1, pagingRequest.getSize(), sort);
         Specification<User> specification = UserSpecification.getSpecification(request);
         List<User> users = userRepository.findAll(specification);
