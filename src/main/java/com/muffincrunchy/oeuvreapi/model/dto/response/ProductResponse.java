@@ -16,6 +16,7 @@ public class ProductResponse {
     private UserResponse user;
     private String category;
     private String type;
+    private ProductDescriptionResponse description;
     private Date createdAt;
     private Date updatedAt;
     private ImageResponse image;

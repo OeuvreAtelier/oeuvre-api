@@ -1,6 +1,5 @@
 package com.muffincrunchy.oeuvreapi.model.dto.response;
 
-import com.muffincrunchy.oeuvreapi.model.entity.Gender;
 import lombok.Builder;
 import lombok.Data;
 
@@ -15,10 +14,11 @@ public class UserResponse {
     private String lastName;
     private String displayName;
     private String email;
-    private Gender gender;
+    private String gender;
     private Date birthDate;
     private String phoneNumber;
     private boolean isArtist;
+    private UserDescriptionResponse description;
     private String userAccountId;
     private Date createdAt;
     private Date updatedAt;

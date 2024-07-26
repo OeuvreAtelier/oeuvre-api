@@ -30,5 +30,7 @@ public class CreateProductRequest {
     @NotBlank(message = "type is required")
     private String type;
 
+    private String description;
+
     private MultipartFile image;
 }

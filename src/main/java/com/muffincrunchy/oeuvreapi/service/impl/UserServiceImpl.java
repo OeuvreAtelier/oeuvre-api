@@ -4,22 +4,16 @@ import com.muffincrunchy.oeuvreapi.model.constant.UserGender;
 import com.muffincrunchy.oeuvreapi.model.dto.request.PagingRequest;
 import com.muffincrunchy.oeuvreapi.model.dto.request.SearchArtistRequest;
 import com.muffincrunchy.oeuvreapi.model.dto.request.UpdateUserRequest;
-import com.muffincrunchy.oeuvreapi.model.dto.response.ImageResponse;
 import com.muffincrunchy.oeuvreapi.model.dto.response.UserResponse;
-import com.muffincrunchy.oeuvreapi.model.entity.Image;
-import com.muffincrunchy.oeuvreapi.model.entity.User;
-import com.muffincrunchy.oeuvreapi.model.entity.UserAccount;
+import com.muffincrunchy.oeuvreapi.model.entity.*;
 import com.muffincrunchy.oeuvreapi.repository.UserRepository;
-import com.muffincrunchy.oeuvreapi.service.GenderService;
-import com.muffincrunchy.oeuvreapi.service.ImageService;
-import com.muffincrunchy.oeuvreapi.service.UserService;
-import com.muffincrunchy.oeuvreapi.service.UserAccountService;
+import com.muffincrunchy.oeuvreapi.service.*;
+import com.muffincrunchy.oeuvreapi.utils.parsing.ToResponse;
 import com.muffincrunchy.oeuvreapi.utils.validation.Validation;
 import com.muffincrunchy.oeuvreapi.utils.specification.UserSpecification;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -29,17 +23,16 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Date;
 import java.util.List;
 
-import static com.muffincrunchy.oeuvreapi.model.constant.ApiUrl.PRODUCT_IMG_URL;
-
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
 
-    private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
     private final UserRepository userRepository;
     private final UserAccountService userAccountService;
     private final GenderService genderService;
     private final ImageService imageService;
+    private final UserDescriptionService userDescriptionService;
     private final Validation validation;
 
     @PostConstruct
@@ -52,7 +45,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserResponse> getAll() {
         List<User> users = userRepository.findAll();
-        return users.stream().map(this::parseToResponse).toList();
+        return users.stream().map(ToResponse::parseUser).toList();
     }
 
     @Override
@@ -65,7 +58,7 @@ public class UserServiceImpl implements UserService {
         Pageable pageable = PageRequest.of(pagingRequest.getPage()-1, pagingRequest.getSize(), sort);
         Specification<User> specification = UserSpecification.getSpecification(request);
         List<User> users = userRepository.findAll(specification);
-        List<UserResponse> userResponses = users.stream().map(this::parseToResponse).toList();
+        List<UserResponse> userResponses = users.stream().map(ToResponse::parseUser).toList();
         final int start = (int) pageable.getOffset();
         final int end = Math.min(start + pageable.getPageSize(), userResponses.size());
         return new PageImpl<>(userResponses.subList(start, end), pageable, userResponses.size());
@@ -80,7 +73,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse getResponseById(String id) {
         User user = userRepository.findById(id).orElse(null);
         if (user != null) {
-            return parseToResponse(user);
+            return ToResponse.parseUser(user);
         }
         return null;
     }
@@ -119,14 +112,38 @@ public class UserServiceImpl implements UserService {
         user.setGender(genderService.getOrSave(UserGender.valueOf(request.getGender())));
         user.setBirthDate(request.getBirthDate());
         user.setPhoneNumber(request.getPhoneNumber());
+        if (!request.getDescription().isEmpty() || !request.getPixiv().isEmpty()) {
+            if (user.getDescription() == null) {
+                user.setDescription(
+                        userDescriptionService.create(UserDescription.builder()
+                                .description(request.getDescription())
+                                .pixiv(request.getPixiv())
+                                .build())
+                );
+            } else {
+                user.setDescription(
+                        userDescriptionService.update(UserDescription.builder()
+                                .id(user.getDescription().getId())
+                                .description(request.getDescription())
+                                .pixiv(request.getPixiv())
+                                .createdAt(user.getDescription().getCreatedAt())
+                                .updatedAt(user.getDescription().getUpdatedAt())
+                                .build())
+                );
+            }
+        }
         user.setUpdatedAt(new Date());
         userRepository.saveAndFlush(user);
-        return parseToResponse(user);
+        return ToResponse.parseUser(user);
     }
 
     @Override
     public void delete(String id) {
+        String imgId = getById(id).getImage().getId();
+        String descId = getById(id).getDescription().getId();
         userRepository.delete(getById(id));
+        imageService.deleteById(imgId);
+        userDescriptionService.delete(descId);
     }
 
     @Override
@@ -138,35 +155,5 @@ public class UserServiceImpl implements UserService {
     public void updateArtistStatusById(String id, Boolean isArtist) {
         getById(id);
         userRepository.updateArtistStatus(id, isArtist);
-    }
-
-    private UserResponse parseToResponse(User user){
-        String userId = null;
-        ImageResponse imageResponse = null;
-        if(user.getUserAccount() != null){
-            userId = user.getUserAccount().getId();
-        }
-        if (user.getImage() != null) {
-            imageResponse = ImageResponse.builder()
-                    .url(PRODUCT_IMG_URL + user.getImage().getId())
-                    .path(user.getImage().getPath())
-                    .name(user.getImage().getName())
-                    .build();
-        }
-        return UserResponse.builder()
-                .id(user.getId())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .displayName(user.getDisplayName())
-                .email(user.getEmail())
-                .gender(user.getGender())
-                .birthDate(user.getBirthDate())
-                .phoneNumber(user.getPhoneNumber())
-                .isArtist(user.isArtist())
-                .userAccountId(userId)
-                .createdAt(user.getCreatedAt())
-                .updatedAt(user.getUpdatedAt())
-                .image(imageResponse)
-                .build();
     }
 }

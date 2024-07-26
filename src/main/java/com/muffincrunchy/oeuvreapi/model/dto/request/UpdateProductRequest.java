@@ -29,5 +29,7 @@ public class UpdateProductRequest {
     @NotBlank(message = "type is required")
     private String type;
 
+    private String description;
+
     private MultipartFile image;
 }
