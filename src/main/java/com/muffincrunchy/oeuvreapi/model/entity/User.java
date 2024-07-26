@@ -43,6 +43,10 @@ public class User {
     @Column(name = "phone_number")
     private String phoneNumber;
 
+    @OneToOne
+    @JoinColumn(name = "description_id")
+    private UserDescription description;
+
     @Column(name = "is_artist")
     private boolean isArtist;
 
