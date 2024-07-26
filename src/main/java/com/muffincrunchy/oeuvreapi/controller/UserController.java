@@ -49,7 +49,7 @@ public class UserController {
     public ResponseEntity<CommonResponse<List<UserResponse>>> searchArtist(
             @RequestParam(name = "page", defaultValue = "1") Integer page,
             @RequestParam(name = "size", defaultValue = "24") Integer size,
-            @RequestParam(name = "sortBy", defaultValue = "name") String sortBy,
+            @RequestParam(name = "sortBy", defaultValue = "displayName") String sortBy,
             @RequestParam(name = "direction", defaultValue = "asc") String direction,
             @RequestParam(name = "displayName", required = false) String displayName
     ) {
