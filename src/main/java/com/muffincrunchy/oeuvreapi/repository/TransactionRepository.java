@@ -14,11 +14,5 @@ import java.util.List;
 @Transactional
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, String> {
-
-    @Query(value = "SELECT * FROM transactions", nativeQuery = true)
-    List<Transaction> getAllTransactions();
-
-    @Modifying
-    @Query(value = "INSERT INTO transactions (id, customer_id, trans_date) VALUES (:id, :customer_id, :trans_date)", nativeQuery = true)
-    int createTransaction(@Param("id") String id, @Param("customer_id") String customerId, @Param("trans_date") Date transDate);
+    List<Transaction> findAllByUserId(String userId);
 }

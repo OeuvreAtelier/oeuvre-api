@@ -14,20 +14,21 @@ import lombok.*;
 public class TransactionDetail {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
+    @Column(name = "invoice")
+    private String invoice;
+
     @ManyToOne
-    @JoinColumn(name = "trans_id", nullable = false)
+    @JoinColumn(name = "transaction_id", nullable = false)
     @JsonBackReference
     private Transaction transaction;
 
     @ManyToOne
-    @JoinColumn(name = "merch_id", nullable = false)
+    @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @Column(name = "merch_price", updatable = false, nullable = false)
-    private Long merchPrice;
-
-    @Column(name = "qty", nullable = false)
-    private Integer qty;
+    @Column(name = "quantity", nullable = false)
+    private Integer quantity;
 }

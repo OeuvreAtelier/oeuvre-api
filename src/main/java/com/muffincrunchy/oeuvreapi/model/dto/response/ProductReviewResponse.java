@@ -10,6 +10,7 @@ import java.util.Date;
 public class ProductReviewResponse {
 
     private String id;
+    private TransactionDetailResponse transactionDetail;
     private UserResponse user;
     private ProductResponse product;
     private double rating;

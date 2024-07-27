@@ -8,6 +8,7 @@ public class ApiUrl {
     public static final String TRANSACTION_URL = BASE_URL + "/transactions";
     public static final String AUTH_URL = BASE_URL + "/auth";
     public static final String PRODUCT_REVIEW_URL = BASE_URL + "/reviews";
+    public static final String STORE_URL = BASE_URL + "/stores";
     public static final String IMG_URL = BASE_URL + "/images/";
     public static final String ID_PATH = "/{id}";
     public static final String SEARCH_PATH = "/search";
