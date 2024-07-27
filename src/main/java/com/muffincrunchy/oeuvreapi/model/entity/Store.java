@@ -12,18 +12,29 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "user_descriptions")
-public class UserDescription {
+@Table(name = "stores")
+public class Store {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
+
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @OneToOne
+    @JoinColumn(name = "address_id")
+    private Address address;
 
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
     @Column(name = "pixiv")
     private String pixiv;
+
+    @Column(name = "twitter")
+    private String twitter;
 
     @Column(name = "created_at")
     @Temporal(TemporalType.TIMESTAMP)

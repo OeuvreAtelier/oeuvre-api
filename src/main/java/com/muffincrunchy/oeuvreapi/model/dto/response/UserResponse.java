@@ -18,7 +18,7 @@ public class UserResponse {
     private Date birthDate;
     private String phoneNumber;
     private boolean isArtist;
-    private UserDescriptionResponse description;
+    private StoreResponse store;
     private String userAccountId;
     private Date createdAt;
     private Date updatedAt;

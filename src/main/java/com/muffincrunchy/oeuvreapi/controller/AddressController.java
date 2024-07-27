@@ -80,7 +80,7 @@ public class AddressController {
     }
 
     @DeleteMapping(value = ID_PATH)
-    public ResponseEntity<CommonResponse<String>> deleteArtistById(@PathVariable("id") String id) {
+    public ResponseEntity<CommonResponse<String>> deleteAddressById(@PathVariable("id") String id) {
         addressService.delete(id);
         CommonResponse<String> response = CommonResponse.<String>builder()
                 .statusCode(HttpStatus.OK.value())

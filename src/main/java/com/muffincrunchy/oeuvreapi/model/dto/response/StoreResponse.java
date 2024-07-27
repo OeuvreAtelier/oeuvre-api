@@ -7,11 +7,13 @@ import java.util.Date;
 
 @Data
 @Builder
-public class UserDescriptionResponse {
+public class StoreResponse {
 
     private String id;
+    private AddressStoreResponse address;
     private String description;
     private String pixiv;
+    private String twitter;
     private Date createdAt;
     private Date updatedAt;
 }

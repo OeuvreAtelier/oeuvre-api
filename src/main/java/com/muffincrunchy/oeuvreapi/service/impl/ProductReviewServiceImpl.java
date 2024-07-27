@@ -7,11 +7,11 @@ import com.muffincrunchy.oeuvreapi.model.entity.ProductReview;
 import com.muffincrunchy.oeuvreapi.repository.ProductReviewRepository;
 import com.muffincrunchy.oeuvreapi.service.ProductReviewService;
 import com.muffincrunchy.oeuvreapi.service.ProductService;
+import com.muffincrunchy.oeuvreapi.service.TransactionDetailService;
 import com.muffincrunchy.oeuvreapi.service.UserService;
 import com.muffincrunchy.oeuvreapi.utils.parsing.ToResponse;
 import com.muffincrunchy.oeuvreapi.utils.validation.Validation;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +25,7 @@ public class ProductReviewServiceImpl implements ProductReviewService {
     private final ProductReviewRepository productReviewRepository;
     private final ProductService productService;
     private final UserService userService;
+    private final TransactionDetailService transactionDetailService;
     private final Validation validation;
 
     @Override
@@ -67,6 +68,15 @@ public class ProductReviewServiceImpl implements ProductReviewService {
     }
 
     @Override
+    public ProductReviewResponse getByTransactionDetailId(String transactionDetailId) {
+        ProductReview productReview = productReviewRepository.findByTransactionDetailId(transactionDetailId).orElse(null);
+        if (productReview != null) {
+            return ToResponse.parseProductReview(productReview);
+        }
+        return null;
+    }
+
+    @Override
     public ProductReviewResponse getResponseById(String id) {
         ProductReview productReview = productReviewRepository.findById(id).orElse(null);
         if (productReview != null) {
@@ -79,6 +89,7 @@ public class ProductReviewServiceImpl implements ProductReviewService {
     public ProductReviewResponse create(CreateProductReviewRequest request) {
         validation.validate(request);
         ProductReview productReview = ProductReview.builder()
+                .transactionDetail(transactionDetailService.getById(request.getTransactionDetailId()))
                 .product(productService.getById(request.getProductId()))
                 .user(userService.getById(request.getUserId()))
                 .rating(request.getRating())

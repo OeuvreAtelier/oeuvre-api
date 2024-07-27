@@ -11,7 +11,6 @@ import com.muffincrunchy.oeuvreapi.model.dto.response.PagingResponse;
 import com.muffincrunchy.oeuvreapi.model.dto.response.ProductResponse;
 import com.muffincrunchy.oeuvreapi.service.ProductService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +21,6 @@ import java.util.List;
 
 import static com.muffincrunchy.oeuvreapi.model.constant.ApiUrl.*;
 
-@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(PRODUCT_URL)
@@ -141,7 +139,7 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<CommonResponse<?>> createProduct(@RequestPart(name = "product") String product, @RequestPart(name = "image") MultipartFile image) {
+    public ResponseEntity<CommonResponse<?>> createProduct(@RequestPart(name = "product") String product, @RequestPart(name = "image", required = false) MultipartFile image) {
         CommonResponse.CommonResponseBuilder<ProductResponse> responseBuilder = CommonResponse.builder();
         try {
             CreateProductRequest request = objectMapper.readValue(product, new TypeReference<>() {});

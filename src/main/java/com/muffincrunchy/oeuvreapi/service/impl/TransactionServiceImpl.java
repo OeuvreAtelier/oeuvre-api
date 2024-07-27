@@ -1,18 +1,20 @@
 package com.muffincrunchy.oeuvreapi.service.impl;
 
 import com.muffincrunchy.oeuvreapi.model.dto.request.CreateTransactionRequest;
-import com.muffincrunchy.oeuvreapi.model.dto.response.TransactionDetailResponse;
+import com.muffincrunchy.oeuvreapi.model.dto.request.PagingRequest;
 import com.muffincrunchy.oeuvreapi.model.dto.response.TransactionResponse;
 import com.muffincrunchy.oeuvreapi.model.entity.*;
 import com.muffincrunchy.oeuvreapi.repository.TransactionRepository;
 import com.muffincrunchy.oeuvreapi.service.*;
+import com.muffincrunchy.oeuvreapi.utils.generator.Generator;
+import com.muffincrunchy.oeuvreapi.utils.parsing.ToResponse;
 import com.muffincrunchy.oeuvreapi.utils.validation.Validation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -22,78 +24,65 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionDetailService transactionDetailService;
     private final UserService userService;
     private final ProductService productService;
+    private final AddressService addressService;
     private final Validation validation;
 
     @Override
-    public List<TransactionResponse> getAllTransactions() {
-        List<Transaction> transactions = transactionRepository.getAllTransactions();
-        return transactions.stream().map(
-                transaction -> {
-                    List<TransactionDetailResponse> transactionDetailResponses = transaction.getTransactionDetails().stream().map(
-                            transactionDetail -> TransactionDetailResponse.builder()
-                                    .Id(transactionDetail.getId())
-                                    .merchId(transactionDetail.getProduct().getId())
-                                    .merchPrice(transactionDetail.getMerchPrice())
-                                    .qty(transactionDetail.getQty())
-                                    .build()
-                    ).toList();
-                    return TransactionResponse.builder()
-                            .id(transaction.getId())
-                            .userId(transaction.getUser().getId())
-                            .transDate(transaction.getTransDate())
-                            .transactionDetails(transactionDetailResponses)
-                            .build();
-                }
-        ).toList();
+    public List<TransactionResponse> getAll() {
+        List<Transaction> transactions = transactionRepository.findAll();
+        return transactions.stream().map(ToResponse::parseTransaction).toList();
     }
 
     @Override
-    public TransactionResponse createTransaction(CreateTransactionRequest request) {
+    public TransactionResponse getById(String id) {
+        Transaction transaction = transactionRepository.findById(id).orElse(null);
+        if (transaction != null) {
+            return ToResponse.parseTransaction(transaction);
+        }
+        return null;
+    }
+
+    @Override
+    public Page<TransactionResponse> getAllByUserId(PagingRequest pagingRequest, String userId) {
+        if (pagingRequest.getPage() <= 0) {
+            pagingRequest.setPage(1);
+        }
+        Sort sort = Sort.by(Sort.Direction.fromString(pagingRequest.getDirection()), pagingRequest.getSortBy());
+        Pageable pageable = PageRequest.of(pagingRequest.getPage()-1, pagingRequest.getSize(), sort);
+        List<Transaction> transactions = transactionRepository.findAllByUserId(userId);
+        List<TransactionResponse> transactionResponses = transactions.stream().map(ToResponse::parseTransaction).toList();
+        final int start = (int) pageable.getOffset();
+        final int end = Math.min(start + pageable.getPageSize(), transactionResponses.size());
+        return new PageImpl<>(transactionResponses.subList(start, end), pageable, transactionResponses.size());
+    }
+
+    @Override
+    public TransactionResponse create(CreateTransactionRequest request) {
         validation.validate(request);
-        User user = userService.getById(request.getUserId());
         Transaction transaction = Transaction.builder()
-                .id(UUID.randomUUID().toString())
-                .user(user)
-                .transDate(new Date())
+                .user(userService.getById(request.getUserId()))
+                .address(addressService.getById(request.getAddressId()))
+                .transactionDate(new Date())
                 .build();
-        transactionRepository.createTransaction(
-                transaction.getId(),
-                transaction.getUser().getId(),
-                transaction.getTransDate()
-        );
+        transactionRepository.saveAndFlush(transaction);
 
         List<TransactionDetail> transactionDetails = request.getTransactionDetails().stream().map(
-                transactionDetail -> {
-                    Product product = productService.getById(transactionDetail.getMerchId());
-                    if (product.getStock() < transactionDetail.getQty()) {
-                        throw  new RuntimeException("Out of stock");
+                detailRequest -> {
+                    Product product = productService.getById(detailRequest.getProductId());
+                    if (product.getStock() < detailRequest.getQuantity()) {
+                        throw new RuntimeException("Out of stock");
                     }
-                    product.setStock(product.getStock()-transactionDetail.getQty());
+                    product.setStock(product.getStock() - detailRequest.getQuantity());
                     return TransactionDetail.builder()
-                            .id(UUID.randomUUID().toString())
                             .transaction(transaction)
+                            .invoice(Generator.InvoiceGenerator())
                             .product(product)
-                            .merchPrice(product.getPrice())
-                            .qty(transactionDetail.getQty())
+                            .quantity(detailRequest.getQuantity())
                             .build();
                 }
         ).toList();
         transactionDetailService.createBulk(transactionDetails);
         transaction.setTransactionDetails(transactionDetails);
-
-        List<TransactionDetailResponse> transactionDetailResponses = transactionDetails.stream().map(
-                transactionDetail -> TransactionDetailResponse.builder()
-                        .Id(transactionDetail.getId())
-                        .merchId(transactionDetail.getProduct().getId())
-                        .merchPrice(transactionDetail.getMerchPrice())
-                        .qty(transactionDetail.getQty())
-                        .build()
-        ).toList();
-        return TransactionResponse.builder()
-                .id(transaction.getId())
-                .userId(transaction.getUser().getId())
-                .transDate(transaction.getTransDate())
-                .transactionDetails(transactionDetailResponses)
-                .build();
+        return ToResponse.parseTransaction(transaction);
     }
 }

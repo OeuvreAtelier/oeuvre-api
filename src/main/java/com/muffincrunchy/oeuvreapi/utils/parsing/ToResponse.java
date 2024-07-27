@@ -2,14 +2,38 @@ package com.muffincrunchy.oeuvreapi.utils.parsing;
 
 import com.muffincrunchy.oeuvreapi.model.dto.response.*;
 import com.muffincrunchy.oeuvreapi.model.entity.*;
+import com.muffincrunchy.oeuvreapi.utils.generator.Generator;
+
+import java.util.List;
 
 import static com.muffincrunchy.oeuvreapi.model.constant.ApiUrl.IMG_URL;
 
 public class ToResponse {
 
+    public static TransactionDetailResponse parseTransactionDetail(TransactionDetail transactionDetail) {
+        return TransactionDetailResponse.builder()
+                .id(transactionDetail.getId())
+                .invoice(transactionDetail.getInvoice())
+                .product(parseProduct(transactionDetail.getProduct()))
+                .quantity(transactionDetail.getQuantity())
+                .build();
+    }
+
+    public static TransactionResponse parseTransaction(Transaction transaction) {
+        List<TransactionDetailResponse> transactionDetails = transaction.getTransactionDetails().stream().map(ToResponse::parseTransactionDetail).toList();
+        return TransactionResponse.builder()
+                .id(transaction.getId())
+                .address(parseAddress(transaction.getAddress()))
+                .user(parseUser(transaction.getUser()))
+                .transactionDate(transaction.getTransactionDate())
+                .transactionDetails(transactionDetails)
+                .build();
+    }
+
     public static ProductReviewResponse parseProductReview(ProductReview productReview) {
         return ProductReviewResponse.builder()
                 .id(productReview.getId())
+                .transactionDetail(parseTransactionDetail(productReview.getTransactionDetail()))
                 .user(parseUser(productReview.getUser()))
                 .product(parseProduct(productReview.getProduct()))
                 .rating(productReview.getRating())
@@ -27,13 +51,29 @@ public class ToResponse {
                 .build();
     }
 
-    public static UserDescriptionResponse parseUserDescription(UserDescription userDescription) {
-        return UserDescriptionResponse.builder()
-                .id(userDescription.getId())
-                .description(userDescription.getDescription())
-                .pixiv(userDescription.getPixiv())
-                .createdAt(userDescription.getCreatedAt())
-                .updatedAt(userDescription.getUpdatedAt())
+    public static StoreResponse parseStore(Store store) {
+        return StoreResponse.builder()
+                .id(store.getId())
+                .description(store.getDescription())
+                .pixiv(store.getPixiv())
+                .twitter(store.getTwitter())
+                .address(parseAddressStore(store.getAddress()))
+                .createdAt(store.getCreatedAt())
+                .updatedAt(store.getUpdatedAt())
+                .build();
+    }
+
+    public static AddressStoreResponse parseAddressStore(Address address) {
+        return AddressStoreResponse.builder()
+                .id(address.getId())
+                .country(address.getCountry())
+                .state(address.getState())
+                .city(address.getCity())
+                .detail(address.getDetail())
+                .postalCode(address.getPostalCode())
+                .phoneNumber(address.getPhoneNumber())
+                .createdAt(address.getCreatedAt())
+                .updatedAt(address.getUpdatedAt())
                 .build();
     }
 
@@ -92,7 +132,7 @@ public class ToResponse {
         String userId = null;
         String gender = null;
         ImageResponse image = null;
-        UserDescriptionResponse description = null;
+        StoreResponse store = null;
         if(user.getUserAccount() != null){
             userId = user.getUserAccount().getId();
         }
@@ -106,8 +146,8 @@ public class ToResponse {
                     .name(user.getImage().getName())
                     .build();
         }
-        if (user.getDescription() != null) {
-            description = parseUserDescription(user.getDescription());
+        if (user.getStore() != null) {
+            store = parseStore(user.getStore());
         }
         return UserResponse.builder()
                 .id(user.getId())
@@ -118,8 +158,8 @@ public class ToResponse {
                 .gender(gender)
                 .birthDate(user.getBirthDate())
                 .phoneNumber(user.getPhoneNumber())
-                .description(description)
                 .isArtist(user.isArtist())
+                .store(store)
                 .userAccountId(userId)
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())

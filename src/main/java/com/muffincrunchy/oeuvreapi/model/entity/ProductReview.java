@@ -19,6 +19,10 @@ public class ProductReview {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
+    @OneToOne
+    @JoinColumn(name = "transaction_detail_id")
+    private TransactionDetail transactionDetail;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
