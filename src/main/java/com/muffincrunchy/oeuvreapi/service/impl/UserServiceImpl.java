@@ -13,7 +13,6 @@ import com.muffincrunchy.oeuvreapi.utils.validation.Validation;
 import com.muffincrunchy.oeuvreapi.utils.specification.UserSpecification;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -23,7 +22,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Date;
 import java.util.List;
 
-@Slf4j
 @RequiredArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
@@ -32,7 +30,6 @@ public class UserServiceImpl implements UserService {
     private final UserAccountService userAccountService;
     private final GenderService genderService;
     private final ImageService imageService;
-    private final UserDescriptionService userDescriptionService;
     private final Validation validation;
 
     @PostConstruct
@@ -111,26 +108,6 @@ public class UserServiceImpl implements UserService {
         user.setGender(genderService.getOrSave(UserGender.valueOf(request.getGender())));
         user.setBirthDate(request.getBirthDate());
         user.setPhoneNumber(request.getPhoneNumber());
-        if (!request.getDescription().isEmpty() || !request.getPixiv().isEmpty()) {
-            if (user.getDescription() == null) {
-                user.setDescription(
-                        userDescriptionService.create(UserDescription.builder()
-                                .description(request.getDescription())
-                                .pixiv(request.getPixiv())
-                                .build())
-                );
-            } else {
-                user.setDescription(
-                        userDescriptionService.update(UserDescription.builder()
-                                .id(user.getDescription().getId())
-                                .description(request.getDescription())
-                                .pixiv(request.getPixiv())
-                                .createdAt(user.getDescription().getCreatedAt())
-                                .updatedAt(user.getDescription().getUpdatedAt())
-                                .build())
-                );
-            }
-        }
         user.setUpdatedAt(new Date());
         userRepository.saveAndFlush(user);
         return ToResponse.parseUser(user);
@@ -138,11 +115,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void delete(String id) {
-        String imgId = getById(id).getImage().getId();
-        String descId = getById(id).getDescription().getId();
         userRepository.delete(getById(id));
-        imageService.deleteById(imgId);
-        userDescriptionService.delete(descId);
     }
 
     @Override
@@ -154,5 +127,12 @@ public class UserServiceImpl implements UserService {
     public void updateArtistStatusById(String id, Boolean isArtist) {
         getById(id);
         userRepository.updateArtistStatus(id, isArtist);
+    }
+
+    @Override
+    public void saveStore(Store store) {
+        User user = getById(store.getUser().getId());
+        user.setStore(store);
+        userRepository.saveAndFlush(user);
     }
 }

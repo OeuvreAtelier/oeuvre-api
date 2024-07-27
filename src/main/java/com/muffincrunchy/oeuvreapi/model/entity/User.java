@@ -28,7 +28,7 @@ public class User {
     @Column(name = "display_name")
     private String displayName;
 
-    @Column(name = "email")
+    @Column(name = "email", unique = true)
     private String email;
 
     @ManyToOne
@@ -43,12 +43,12 @@ public class User {
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    @OneToOne
-    @JoinColumn(name = "description_id")
-    private UserDescription description;
-
     @Column(name = "is_artist")
     private boolean isArtist;
+
+    @OneToOne
+    @JoinColumn(name = "store_id")
+    private Store store;
 
     @OneToOne
     @JoinColumn(name = "user_account_id", unique = true)

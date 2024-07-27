@@ -10,18 +10,10 @@ import lombok.Data;
 @Builder
 public class CreateTransactionDetailRequest {
 
-    @NotBlank(message = "merch_id is required")
-    @JsonProperty("merch_id")
-    private String merchId;
+    @NotBlank(message = "product_id is required")
+    @JsonProperty("product_id")
+    private String productId;
 
-    @NotBlank(message = "shipment_id is required")
-    @JsonProperty("shipment_id")
-    private String shipmentId;
-
-    @NotNull(message = "qty is required")
-    private Integer qty;
-
-    @NotBlank(message = "payment is required")
-    @JsonProperty("payment")
-    private String payment;
+    @NotNull(message = "quantity is required")
+    private Integer quantity;
 }

@@ -12,6 +12,10 @@ import lombok.Data;
 @Builder
 public class CreateProductReviewRequest {
 
+    @NotBlank(message = "transaction_detail_id is required")
+    @JsonProperty("transaction_detail_id")
+    private String transactionDetailId;
+
     @NotBlank(message = "user_id is required")
     @JsonProperty("user_id")
     private String userId;

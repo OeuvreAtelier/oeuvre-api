@@ -4,6 +4,7 @@ import com.muffincrunchy.oeuvreapi.model.dto.request.PagingRequest;
 import com.muffincrunchy.oeuvreapi.model.dto.request.SearchArtistRequest;
 import com.muffincrunchy.oeuvreapi.model.dto.request.UpdateUserRequest;
 import com.muffincrunchy.oeuvreapi.model.dto.response.UserResponse;
+import com.muffincrunchy.oeuvreapi.model.entity.Store;
 import com.muffincrunchy.oeuvreapi.model.entity.User;
 import org.springframework.data.domain.Page;
 
@@ -20,4 +21,5 @@ public interface UserService {
     void delete(String id);
     User getByUserAccountId(String userAccountId);
     void updateArtistStatusById(String id, Boolean isArtist);
+    void saveStore(Store store);
 }

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static com.muffincrunchy.oeuvreapi.model.constant.ApiUrl.ID_PATH;
 import static com.muffincrunchy.oeuvreapi.model.constant.ApiUrl.PRODUCT_REVIEW_URL;
 
 @RequiredArgsConstructor
@@ -96,6 +97,28 @@ public class ProductReviewController {
                 .message("success fetch data")
                 .data(productReview.getContent())
                 .paging(pagingResponse)
+                .build();
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping(ID_PATH)
+    public ResponseEntity<CommonResponse<ProductReviewResponse>> getProductReviewsById(@PathVariable("id") String id) {
+        ProductReviewResponse productReview = productReviewService.getResponseById(id);
+        CommonResponse<ProductReviewResponse> response = CommonResponse.<ProductReviewResponse>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("success save data")
+                .data(productReview)
+                .build();
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("transaction/{transaction_id}")
+    public ResponseEntity<CommonResponse<ProductReviewResponse>> getProductReviewsByTransactionDetailId(@PathVariable("transaction_id") String transactionId) {
+        ProductReviewResponse productReview = productReviewService.getByTransactionDetailId(transactionId);
+        CommonResponse<ProductReviewResponse> response = CommonResponse.<ProductReviewResponse>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("success save data")
+                .data(productReview)
                 .build();
         return ResponseEntity.ok(response);
     }

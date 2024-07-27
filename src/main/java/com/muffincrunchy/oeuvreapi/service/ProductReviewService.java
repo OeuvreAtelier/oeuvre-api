@@ -15,6 +15,7 @@ public interface ProductReviewService {
     Page<ProductReviewResponse> getByUserID(PagingRequest pagingRequest, String userId);
     ProductReview getById(String id);
     ProductReviewResponse getResponseById(String id);
+    ProductReviewResponse getByTransactionDetailId(String transactionDetailId);
     ProductReviewResponse create(CreateProductReviewRequest request);
     void delete(String id);
 }
