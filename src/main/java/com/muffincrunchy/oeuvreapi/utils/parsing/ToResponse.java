@@ -2,7 +2,6 @@ package com.muffincrunchy.oeuvreapi.utils.parsing;
 
 import com.muffincrunchy.oeuvreapi.model.dto.response.*;
 import com.muffincrunchy.oeuvreapi.model.entity.*;
-import com.muffincrunchy.oeuvreapi.utils.generator.Generator;
 
 import java.util.List;
 
@@ -102,7 +101,6 @@ public class ToResponse {
         }
         if (product.getImage() != null) {
             image = ImageResponse.builder()
-                    .url(IMG_URL + product.getImage().getId())
                     .path(product.getImage().getPath())
                     .name(product.getImage().getName())
                     .build();
@@ -131,7 +129,8 @@ public class ToResponse {
     public static UserResponse parseUser(User user){
         String userId = null;
         String gender = null;
-        ImageResponse image = null;
+        ImageResponse imagePicture = null;
+        ImageResponse imageBanner = null;
         StoreResponse store = null;
         if(user.getUserAccount() != null){
             userId = user.getUserAccount().getId();
@@ -139,11 +138,16 @@ public class ToResponse {
         if (user.getGender() != null) {
             gender = user.getGender().getGender().toString();
         }
-        if (user.getImage() != null) {
-            image = ImageResponse.builder()
-                    .url(IMG_URL + user.getImage().getId())
-                    .path(user.getImage().getPath())
-                    .name(user.getImage().getName())
+        if (user.getImagePicture() != null) {
+            imagePicture = ImageResponse.builder()
+                    .path(user.getImagePicture().getPath())
+                    .name(user.getImagePicture().getName())
+                    .build();
+        }
+        if (user.getImageBanner() != null) {
+            imageBanner = ImageResponse.builder()
+                    .path(user.getImageBanner().getPath())
+                    .name(user.getImageBanner().getName())
                     .build();
         }
         if (user.getStore() != null) {
@@ -163,7 +167,8 @@ public class ToResponse {
                 .userAccountId(userId)
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
-                .image(image)
+                .imagePicture(imagePicture)
+                .imageBanner(imageBanner)
                 .build();
     }
 }

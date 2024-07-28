@@ -65,6 +65,10 @@ public class User {
     private Date updatedAt;
 
     @OneToOne
-    @JoinColumn(name = "image_id")
-    private Image image;
+    @JoinColumn(name = "image_picture_id")
+    private Image imagePicture;
+
+    @OneToOne
+    @JoinColumn(name = "image_banner_id")
+    private Image imageBanner;
 }

@@ -41,9 +41,4 @@ public class UpdateUserRequest {
     @NotBlank(message = "phone_number is required")
     @JsonProperty("phone_number")
     private String phoneNumber;
-
-    @JsonProperty("store_id")
-    private String storeId;
-
-    private MultipartFile image;
 }
