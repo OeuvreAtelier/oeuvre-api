@@ -6,7 +6,6 @@ import lombok.Data;
 @Data
 @Builder
 public class ImageResponse {
-    private String url;
     private String path;
     private String name;
 }

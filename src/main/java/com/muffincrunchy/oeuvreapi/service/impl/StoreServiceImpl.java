@@ -67,7 +67,7 @@ public class StoreServiceImpl implements StoreService {
                 .updatedAt(new Date())
                 .build();
         storeRepository.saveAndFlush(store);
-        userService.saveStore(store);
+        userService.saveStore(request.getUserId(), store.getId());
         return ToResponse.parseStore(store);
     }
 

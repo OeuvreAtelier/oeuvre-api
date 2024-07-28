@@ -6,6 +6,7 @@ import com.muffincrunchy.oeuvreapi.model.dto.request.AuthRequest;
 import com.muffincrunchy.oeuvreapi.model.dto.request.RegisterRequest;
 import com.muffincrunchy.oeuvreapi.model.dto.response.LoginResponse;
 import com.muffincrunchy.oeuvreapi.model.dto.response.RegisterResponse;
+import com.muffincrunchy.oeuvreapi.model.dto.response.UserResponse;
 import com.muffincrunchy.oeuvreapi.model.entity.User;
 import com.muffincrunchy.oeuvreapi.model.entity.Role;
 import com.muffincrunchy.oeuvreapi.model.entity.UserAccount;
@@ -13,7 +14,6 @@ import com.muffincrunchy.oeuvreapi.repository.UserAccountRepository;
 import com.muffincrunchy.oeuvreapi.service.*;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,7 +26,6 @@ import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -109,7 +108,7 @@ public class AuthServiceImpl implements AuthService {
         roles.add(roleService.getOrSave(UserRole.ROLE_ARTIST));
         userAccount.setRoles(roles);
         userAccountRepository.saveAndFlush(userAccount);
-        User user = userService.getByUserAccountId(userAccount.getId());
+        UserResponse user = userService.getByUserAccountId(userAccount.getId());
         userService.updateArtistStatusById(user.getId(), true);
         return RegisterResponse.builder()
                 .username(userAccount.getUsername())

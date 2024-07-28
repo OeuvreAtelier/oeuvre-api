@@ -1,9 +1,8 @@
 package com.muffincrunchy.oeuvreapi.service.impl;
 
+import com.muffincrunchy.oeuvreapi.model.constant.ImageUrl;
 import com.muffincrunchy.oeuvreapi.model.constant.UserGender;
-import com.muffincrunchy.oeuvreapi.model.dto.request.PagingRequest;
-import com.muffincrunchy.oeuvreapi.model.dto.request.SearchArtistRequest;
-import com.muffincrunchy.oeuvreapi.model.dto.request.UpdateUserRequest;
+import com.muffincrunchy.oeuvreapi.model.dto.request.*;
 import com.muffincrunchy.oeuvreapi.model.dto.response.UserResponse;
 import com.muffincrunchy.oeuvreapi.model.entity.*;
 import com.muffincrunchy.oeuvreapi.repository.UserRepository;
@@ -21,6 +20,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Date;
 import java.util.List;
+
+import static com.muffincrunchy.oeuvreapi.model.constant.ImageUrl.USER_BANNER;
+import static com.muffincrunchy.oeuvreapi.model.constant.ImageUrl.USER_PICTURE;
 
 @RequiredArgsConstructor
 @Service
@@ -90,17 +92,6 @@ public class UserServiceImpl implements UserService {
         if(!userAccount.getId().equals(user.getUserAccount().getId())){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,"user not found");
         }
-        if (request.getImage() != null) {
-            if (user.getImage() != null) {
-                String oldImageId = user.getImage().getId();
-                Image newImage = imageService.create(request.getImage());
-                user.setImage(newImage);
-                imageService.deleteById(oldImageId);
-            } else {
-                Image newImage = imageService.create(request.getImage());
-                user.setImage(newImage);
-            }
-        }
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
         user.setDisplayName(request.getDisplayName());
@@ -119,8 +110,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getByUserAccountId(String userAccountId) {
-        return userRepository.findByUserAccountId(userAccountId);
+    public UserResponse getByUserAccountId(String userAccountId) {
+        User user = userRepository.findByUserAccountId(userAccountId).orElse(null);
+        if (user != null) {
+            return ToResponse.parseUser(user);
+        }
+        return null;
     }
 
     @Override
@@ -130,9 +125,36 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void saveStore(Store store) {
-        User user = getById(store.getUser().getId());
-        user.setStore(store);
-        userRepository.saveAndFlush(user);
+    public void updateUserPicture(UpdateUserPictureRequest request) {
+        User user = getById(request.getUserId());
+        Image image;
+        if (user.getImagePicture() != null) {
+            String oldImageId = user.getImagePicture().getId();
+            image = imageService.create(request.getImage(), USER_PICTURE);
+            imageService.deleteById(oldImageId);
+        } else {
+            image = imageService.create(request.getImage(), USER_PICTURE);
+        }
+        userRepository.updateImagePictureId(request.getUserId(), image.getId());
+    }
+
+    @Override
+    public void updateUserBanner(UpdateUserBannerRequest request) {
+        User user = getById(request.getUserId());
+        Image image;
+        if (user.getImagePicture() != null) {
+            String oldImageId = user.getImageBanner().getId();
+            image = imageService.create(request.getImage(), USER_BANNER);
+            imageService.deleteById(oldImageId);
+        } else {
+            image = imageService.create(request.getImage(), USER_BANNER);
+        }
+        userRepository.updateImageBannerId(request.getUserId(), image.getId());
+    }
+
+    @Override
+    public void saveStore(String id, String storeId) {
+        getById(id);
+        userRepository.updateStore(id, storeId);
     }
 }
