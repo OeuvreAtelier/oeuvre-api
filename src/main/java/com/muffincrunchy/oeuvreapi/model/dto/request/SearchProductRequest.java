@@ -8,4 +8,6 @@ import lombok.Data;
 public class SearchProductRequest {
 
     private String name;
+    private String category;
+    private String type;
 }

@@ -66,10 +66,14 @@ public class ProductController {
             @RequestParam(name = "size", defaultValue = "24") Integer size,
             @RequestParam(name = "sortBy", defaultValue = "updatedAt") String sortBy,
             @RequestParam(name = "direction", defaultValue = "desc") String direction,
-            @RequestParam(name = "name", required = false) String name
+            @RequestParam(name = "name", required = false) String name,
+            @RequestParam(name = "category", required = false) String category,
+            @RequestParam(name = "type", required = false) String type
     ) {
         SearchProductRequest request = SearchProductRequest.builder()
                 .name(name)
+                .category(category)
+                .type(type)
                 .build();
         PagingRequest pagingRequest = PagingRequest.builder()
                 .page(page)
