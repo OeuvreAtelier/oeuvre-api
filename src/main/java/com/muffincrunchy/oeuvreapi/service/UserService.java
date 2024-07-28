@@ -1,8 +1,6 @@
 package com.muffincrunchy.oeuvreapi.service;
 
-import com.muffincrunchy.oeuvreapi.model.dto.request.PagingRequest;
-import com.muffincrunchy.oeuvreapi.model.dto.request.SearchArtistRequest;
-import com.muffincrunchy.oeuvreapi.model.dto.request.UpdateUserRequest;
+import com.muffincrunchy.oeuvreapi.model.dto.request.*;
 import com.muffincrunchy.oeuvreapi.model.dto.response.UserResponse;
 import com.muffincrunchy.oeuvreapi.model.entity.Store;
 import com.muffincrunchy.oeuvreapi.model.entity.User;
@@ -19,7 +17,9 @@ public interface UserService {
     User create(User request);
     UserResponse update(UpdateUserRequest request);
     void delete(String id);
-    User getByUserAccountId(String userAccountId);
+    UserResponse getByUserAccountId(String userAccountId);
     void updateArtistStatusById(String id, Boolean isArtist);
-    void saveStore(Store store);
+    void updateUserPicture(UpdateUserPictureRequest request);
+    void updateUserBanner(UpdateUserBannerRequest request);
+    void saveStore(String id, String storeId);
 }

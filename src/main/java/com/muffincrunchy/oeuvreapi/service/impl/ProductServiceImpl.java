@@ -25,6 +25,8 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 
+import static com.muffincrunchy.oeuvreapi.model.constant.ImageUrl.PRODUCT_COVER;
+
 @RequiredArgsConstructor
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -118,7 +120,7 @@ public class ProductServiceImpl implements ProductService {
                     .updatedAt(new Date())
                     .build());
         }
-        Image image = imageService.create(request.getImage());
+        Image image = imageService.create(request.getImage(), PRODUCT_COVER);
         Product product = Product.builder()
                 .name(request.getName())
                 .category(categoryService.getOrSave(ItemCategory.valueOf(request.getCategory())))
@@ -141,7 +143,7 @@ public class ProductServiceImpl implements ProductService {
         Product product = getById(request.getId());
         if (request.getImage() != null) {
             String oldImageId = product.getImage().getId();
-            Image newImage = imageService.create(request.getImage());
+            Image newImage = imageService.create(request.getImage(), PRODUCT_COVER);
             product.setImage(newImage);
             imageService.deleteById(oldImageId);
         }

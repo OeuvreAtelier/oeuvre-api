@@ -2,13 +2,10 @@ package com.muffincrunchy.oeuvreapi.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.muffincrunchy.oeuvreapi.model.dto.request.PagingRequest;
-import com.muffincrunchy.oeuvreapi.model.dto.request.SearchArtistRequest;
-import com.muffincrunchy.oeuvreapi.model.dto.request.UpdateUserRequest;
+import com.muffincrunchy.oeuvreapi.model.dto.request.*;
 import com.muffincrunchy.oeuvreapi.model.dto.response.PagingResponse;
 import com.muffincrunchy.oeuvreapi.model.dto.response.UserResponse;
 import com.muffincrunchy.oeuvreapi.model.dto.response.CommonResponse;
-import com.muffincrunchy.oeuvreapi.model.entity.User;
 import com.muffincrunchy.oeuvreapi.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -89,9 +86,9 @@ public class UserController {
     }
 
     @GetMapping("/account/{user_account_id}")
-    public ResponseEntity<CommonResponse<User>> getUserByUserAccountId(@PathVariable("user_account_id") String userAccountId) {
-        User user = userService.getByUserAccountId(userAccountId);
-        CommonResponse<User> response = CommonResponse.<User>builder()
+    public ResponseEntity<CommonResponse<UserResponse>> getUserByUserAccountId(@PathVariable("user_account_id") String userAccountId) {
+        UserResponse user = userService.getByUserAccountId(userAccountId);
+        CommonResponse<UserResponse> response = CommonResponse.<UserResponse>builder()
                 .statusCode(HttpStatus.OK.value())
                 .message("success fetch data")
                 .data(user)
@@ -111,16 +108,44 @@ public class UserController {
 //    }
 
     @PutMapping
-    public ResponseEntity<CommonResponse<?>> updateUser(@RequestPart(name = "user") String user, @RequestPart(name = "image", required = false) MultipartFile image) {
+    public ResponseEntity<CommonResponse<?>> updateUserPicture(@RequestBody UpdateUserRequest request) {
+        UserResponse user = userService.update(request);
+        CommonResponse<UserResponse> response = CommonResponse.<UserResponse>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("success save data")
+                .data(user)
+                .build();
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/picture")
+    public ResponseEntity<CommonResponse<?>> updateUserPicture(@RequestPart(name = "user") String user, @RequestPart(name = "image", required = false) MultipartFile image) {
         CommonResponse.CommonResponseBuilder<UserResponse> responseBuilder = CommonResponse.builder();
         try {
-            UpdateUserRequest request = objectMapper.readValue(user, new TypeReference<>() {
+            UpdateUserPictureRequest request = objectMapper.readValue(user, new TypeReference<>() {
             });
             request.setImage(image);
-            UserResponse response = userService.update(request);
+            userService.updateUserPicture(request);
             responseBuilder.statusCode(HttpStatus.CREATED.value());
             responseBuilder.message("success save data");
-            responseBuilder.data(response);
+            return ResponseEntity.status(HttpStatus.CREATED).body(responseBuilder.build());
+        } catch (Exception e) {
+            responseBuilder.message("internal server error");
+            responseBuilder.statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseBuilder.build());
+        }
+    }
+
+    @PutMapping("/banner")
+    public ResponseEntity<CommonResponse<?>> updateUserBanner(@RequestPart(name = "user") String user, @RequestPart(name = "image", required = false) MultipartFile image) {
+        CommonResponse.CommonResponseBuilder<UserResponse> responseBuilder = CommonResponse.builder();
+        try {
+            UpdateUserBannerRequest request = objectMapper.readValue(user, new TypeReference<>() {
+            });
+            request.setImage(image);
+            userService.updateUserBanner(request);
+            responseBuilder.statusCode(HttpStatus.CREATED.value());
+            responseBuilder.message("success save data");
             return ResponseEntity.status(HttpStatus.CREATED).body(responseBuilder.build());
         } catch (Exception e) {
             responseBuilder.message("internal server error");

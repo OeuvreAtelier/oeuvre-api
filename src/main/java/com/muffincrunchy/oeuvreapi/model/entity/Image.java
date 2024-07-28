@@ -27,4 +27,7 @@ public class Image {
 
     @Column(name = "content_type")
     private String contentType;
+
+    @Column(name = "file_id")
+    private String fileId;
 }
