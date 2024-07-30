@@ -2,6 +2,7 @@ package com.muffincrunchy.oeuvreapi.controller;
 
 import com.muffincrunchy.oeuvreapi.model.dto.request.CreateTransactionRequest;
 import com.muffincrunchy.oeuvreapi.model.dto.request.PagingRequest;
+import com.muffincrunchy.oeuvreapi.model.dto.request.UpdatePaymentStatusRequest;
 import com.muffincrunchy.oeuvreapi.model.dto.response.CommonResponse;
 import com.muffincrunchy.oeuvreapi.model.dto.response.PagingResponse;
 import com.muffincrunchy.oeuvreapi.model.dto.response.TransactionResponse;
@@ -14,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 import static com.muffincrunchy.oeuvreapi.model.constant.ApiUrl.ID_PATH;
 import static com.muffincrunchy.oeuvreapi.model.constant.ApiUrl.TRANSACTION_URL;
@@ -90,4 +92,14 @@ public class TransactionController {
                 .build();
         return ResponseEntity.ok(response);
     }
+
+//    @PutMapping("/{id}")
+//    public ResponseEntity<CommonResponse<?>> updateStatus(@PathVariable("id") String id) {
+//        transactionService.updateStatus(id);
+//        return ResponseEntity.ok(CommonResponse.builder()
+//                .statusCode(HttpStatus.OK.value())
+//                .message("success update data")
+//                .build());
+//    }
+
 }

@@ -2,6 +2,8 @@ package com.muffincrunchy.oeuvreapi.service.impl;
 
 import com.muffincrunchy.oeuvreapi.model.dto.request.CreateTransactionRequest;
 import com.muffincrunchy.oeuvreapi.model.dto.request.PagingRequest;
+import com.muffincrunchy.oeuvreapi.model.dto.request.UpdatePaymentStatusRequest;
+import com.muffincrunchy.oeuvreapi.model.dto.response.TransactionDetailResponse;
 import com.muffincrunchy.oeuvreapi.model.dto.response.TransactionResponse;
 import com.muffincrunchy.oeuvreapi.model.entity.*;
 import com.muffincrunchy.oeuvreapi.repository.TransactionRepository;
@@ -11,7 +13,9 @@ import com.muffincrunchy.oeuvreapi.utils.parsing.ToResponse;
 import com.muffincrunchy.oeuvreapi.utils.validation.Validation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Date;
 import java.util.List;
@@ -25,6 +29,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final UserService userService;
     private final ProductService productService;
     private final AddressService addressService;
+    private final PaymentService paymentService;
     private final Validation validation;
 
     @Override
@@ -44,6 +49,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public Page<TransactionResponse> getAllByUserId(PagingRequest pagingRequest, String userId) {
+        transactionRepository.findAllByUserId(userId).forEach(transaction -> updateStatus(transaction.getId()));
         if (pagingRequest.getPage() <= 0) {
             pagingRequest.setPage(1);
         }
@@ -83,6 +89,17 @@ public class TransactionServiceImpl implements TransactionService {
         ).toList();
         transactionDetailService.createBulk(transactionDetails);
         transaction.setTransactionDetails(transactionDetails);
+
+        Payment payment = paymentService.createPayment(transaction);
+        transaction.setPayment(payment);
+        transactionRepository.updatePayment(transaction.getId(), payment.getId());
+
         return ToResponse.parseTransaction(transaction);
+    }
+
+    @Override
+    public void updateStatus(String id) {
+        Transaction transaction = transactionRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "data not found"));
+        paymentService.updateTransactionStatus(transaction.getPayment().getId());
     }
 }

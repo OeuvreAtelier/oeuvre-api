@@ -131,25 +131,28 @@ public class UserServiceImpl implements UserService {
         if (user.getImagePicture() != null) {
             String oldImageId = user.getImagePicture().getId();
             image = imageService.create(request.getImage(), USER_PICTURE);
+            userRepository.updateImagePictureId(request.getUserId(), image.getId());
             imageService.deleteById(oldImageId);
         } else {
             image = imageService.create(request.getImage(), USER_PICTURE);
+            userRepository.updateImagePictureId(request.getUserId(), image.getId());
         }
-        userRepository.updateImagePictureId(request.getUserId(), image.getId());
+
     }
 
     @Override
     public void updateUserBanner(UpdateUserBannerRequest request) {
         User user = getById(request.getUserId());
         Image image;
-        if (user.getImagePicture() != null) {
+        if (user.getImageBanner() != null) {
             String oldImageId = user.getImageBanner().getId();
             image = imageService.create(request.getImage(), USER_BANNER);
+            userRepository.updateImageBannerId(request.getUserId(), image.getId());
             imageService.deleteById(oldImageId);
         } else {
             image = imageService.create(request.getImage(), USER_BANNER);
+            userRepository.updateImageBannerId(request.getUserId(), image.getId());
         }
-        userRepository.updateImageBannerId(request.getUserId(), image.getId());
     }
 
     @Override

@@ -127,7 +127,7 @@ public class UserController {
             request.setImage(image);
             userService.updateUserPicture(request);
             responseBuilder.statusCode(HttpStatus.CREATED.value());
-            responseBuilder.message("success save data");
+            responseBuilder.message("success update data");
             return ResponseEntity.status(HttpStatus.CREATED).body(responseBuilder.build());
         } catch (Exception e) {
             responseBuilder.message("internal server error");
@@ -145,7 +145,7 @@ public class UserController {
             request.setImage(image);
             userService.updateUserBanner(request);
             responseBuilder.statusCode(HttpStatus.CREATED.value());
-            responseBuilder.message("success save data");
+            responseBuilder.message("success update data");
             return ResponseEntity.status(HttpStatus.CREATED).body(responseBuilder.build());
         } catch (Exception e) {
             responseBuilder.message("internal server error");

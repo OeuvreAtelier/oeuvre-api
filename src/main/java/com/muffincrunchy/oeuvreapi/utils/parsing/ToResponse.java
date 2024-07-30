@@ -5,9 +5,16 @@ import com.muffincrunchy.oeuvreapi.model.entity.*;
 
 import java.util.List;
 
-import static com.muffincrunchy.oeuvreapi.model.constant.ApiUrl.IMG_URL;
-
 public class ToResponse {
+
+    public static PaymentResponse parsePayment(Payment payment) {
+        return PaymentResponse.builder()
+                .id(payment.getId())
+                .token(payment.getToken())
+                .redirectUrl(payment.getRedirectUrl())
+                .transactionStatus(payment.getTransactionStatus())
+                .build();
+    }
 
     public static TransactionDetailResponse parseTransactionDetail(TransactionDetail transactionDetail) {
         return TransactionDetailResponse.builder()
@@ -20,12 +27,14 @@ public class ToResponse {
 
     public static TransactionResponse parseTransaction(Transaction transaction) {
         List<TransactionDetailResponse> transactionDetails = transaction.getTransactionDetails().stream().map(ToResponse::parseTransactionDetail).toList();
+        PaymentResponse payment = parsePayment(transaction.getPayment());
         return TransactionResponse.builder()
                 .id(transaction.getId())
                 .address(parseAddress(transaction.getAddress()))
                 .user(parseUser(transaction.getUser()))
                 .transactionDate(transaction.getTransactionDate())
                 .transactionDetails(transactionDetails)
+                .payment(payment)
                 .build();
     }
 
