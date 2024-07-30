@@ -46,8 +46,7 @@ public class ImageServiceImpl implements ImageService {
                         .path(result.getUrl())
                         .fileId(result.getFileId())
                         .build();
-                imageRepository.saveAndFlush(image);
-                return image;
+                return imageRepository.saveAndFlush(image);
             } else {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "failed to upload image", null);
             }

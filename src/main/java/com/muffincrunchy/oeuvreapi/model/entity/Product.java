@@ -44,7 +44,7 @@ public class Product {
     @JoinColumn(name = "description_id", unique = true)
     private ProductDescription description;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
     private Date createdAt;

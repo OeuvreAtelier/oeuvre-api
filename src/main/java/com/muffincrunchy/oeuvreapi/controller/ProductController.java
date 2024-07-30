@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -142,6 +143,7 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'ARTIST')")
     @PostMapping
     public ResponseEntity<CommonResponse<?>> createProduct(@RequestPart(name = "product") String product, @RequestPart(name = "image", required = false) MultipartFile image) {
         CommonResponse.CommonResponseBuilder<ProductResponse> responseBuilder = CommonResponse.builder();
@@ -160,15 +162,16 @@ public class ProductController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'ARTIST')")
     @PutMapping
-    public ResponseEntity<CommonResponse<?>> updateProduct(@RequestPart(name = "product") String product, @RequestPart(name = "image") MultipartFile image) {
+    public ResponseEntity<CommonResponse<?>> updateProduct(@RequestPart(name = "product") String product, @RequestPart(name = "image", required = false) MultipartFile image) {
         CommonResponse.CommonResponseBuilder<ProductResponse> responseBuilder = CommonResponse.builder();
         try {
             UpdateProductRequest request = objectMapper.readValue(product, new TypeReference<>() {});
             request.setImage(image);
             ProductResponse response = productService.update(request);
             responseBuilder.statusCode(HttpStatus.CREATED.value());
-            responseBuilder.message("success save data");
+            responseBuilder.message("success update data");
             responseBuilder.data(response);
             return ResponseEntity.status(HttpStatus.CREATED).body(responseBuilder.build());
         } catch (Exception e) {
@@ -178,6 +181,7 @@ public class ProductController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'ARTIST')")
     @DeleteMapping(value = ID_PATH)
     public ResponseEntity<CommonResponse<String>> deleteProduct(@PathVariable("id") String id) {
         productService.delete(id);

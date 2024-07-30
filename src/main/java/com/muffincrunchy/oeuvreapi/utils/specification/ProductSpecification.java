@@ -17,15 +17,20 @@ public class ProductSpecification {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             if (request.getName() != null) {
-                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + request.getName().toLowerCase() + "%"));
+                if (!request.getName().isEmpty() || !request.getName().isBlank()) {
+                    predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + request.getName().toLowerCase() + "%"));
+                }
             }
             if (request.getCategory() != null) {
-                predicates.add(criteriaBuilder.equal(root.get("category").get("category"), ItemCategory.valueOf(request.getCategory())));
+                if (!request.getCategory().isEmpty() || !request.getCategory().isBlank()) {
+                    predicates.add(criteriaBuilder.equal(root.get("category").get("category"), ItemCategory.valueOf(request.getCategory())));
+                }
             }
             if (request.getType() != null) {
-                predicates.add(criteriaBuilder.equal(root.get("type").get("type"), ItemType.valueOf(request.getType())));
+                if (!request.getType().isEmpty() || !request.getType().isBlank()) {
+                    predicates.add(criteriaBuilder.equal(root.get("type").get("type"), ItemType.valueOf(request.getType())));
+                }
             }
-//            log.info(String.valueOf(root.get("category").get("category")));
             return query.where(criteriaBuilder.and(predicates.toArray(Predicate[]::new))).getRestriction();
         };
     }

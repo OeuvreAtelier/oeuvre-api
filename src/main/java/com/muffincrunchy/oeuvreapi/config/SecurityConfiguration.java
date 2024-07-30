@@ -31,8 +31,9 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(req -> req.dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers("/api/v3/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET,"/api/v3/products/**").permitAll()
-                        .requestMatchers(HttpMethod.GET,"/api/v1/products/images/**").permitAll()
-                        .requestMatchers(HttpMethod.GET,"/api/v1/users/images/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/v3/products/images/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/v3/users/images/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v3/transactions/status").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

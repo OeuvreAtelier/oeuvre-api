@@ -37,7 +37,7 @@ public class ProductReview {
     @Column(name = "review", columnDefinition = "TEXT")
     private String review;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
     private Date createdAt;

@@ -54,7 +54,7 @@ public class User {
     @JoinColumn(name = "user_account_id", unique = true)
     private UserAccount userAccount;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ")
     private Date createdAt;
