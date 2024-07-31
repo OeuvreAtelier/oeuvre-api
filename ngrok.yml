@@ -1,0 +1,7 @@
+version: "2"
+authtoken: 2h5fTy2YFbZjoMRedqEQ0x4amtE_5qSMaFrXdSpsRyzzxN5fL
+tunnels:
+  api:
+    proto: http
+    addr: http://192.168.80.1:8080
+    domain: pleasing-smart-gator.ngrok-free.app
