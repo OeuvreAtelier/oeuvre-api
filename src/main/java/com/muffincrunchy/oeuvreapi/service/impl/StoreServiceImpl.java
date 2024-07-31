@@ -12,6 +12,7 @@ import com.muffincrunchy.oeuvreapi.utils.parsing.ToResponse;
 import com.muffincrunchy.oeuvreapi.utils.validation.Validation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -25,17 +26,20 @@ public class StoreServiceImpl implements StoreService {
     private final AddressService addressService;
     private final Validation validation;
 
+    @Transactional(readOnly = true)
     @Override
     public List<StoreResponse> getAll() {
         List<Store> stores = storeRepository.findAll();
         return stores.stream().map(ToResponse::parseStore).toList();
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Store getById(String id) {
         return storeRepository.findById(id).orElse(null);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public StoreResponse getResponseById(String id) {
         Store store = storeRepository.findById(id).orElse(null);
@@ -45,6 +49,7 @@ public class StoreServiceImpl implements StoreService {
         return null;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public StoreResponse getByUserId(String userId) {
         Store store = storeRepository.findByUserId(userId).orElse(null);
@@ -54,6 +59,7 @@ public class StoreServiceImpl implements StoreService {
         return null;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public StoreResponse create(CreateStoreRequest request) {
         validation.validate(request);
@@ -71,6 +77,7 @@ public class StoreServiceImpl implements StoreService {
         return ToResponse.parseStore(store);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public StoreResponse update(UpdateStoreRequest request) {
         validation.validate(request);
@@ -80,10 +87,10 @@ public class StoreServiceImpl implements StoreService {
         store.setPixiv(request.getPixiv());
         store.setTwitter(request.getTwitter());
         store.setUpdatedAt(new Date());
-        storeRepository.saveAndFlush(store);
         return ToResponse.parseStore(store);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void delete(String id) {
         storeRepository.deleteById(id);

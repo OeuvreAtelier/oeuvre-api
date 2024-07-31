@@ -3,7 +3,6 @@ package com.muffincrunchy.oeuvreapi.service.impl;
 import com.muffincrunchy.oeuvreapi.model.dto.request.CreateTransactionRequest;
 import com.muffincrunchy.oeuvreapi.model.dto.request.PagingRequest;
 import com.muffincrunchy.oeuvreapi.model.dto.request.UpdatePaymentStatusRequest;
-import com.muffincrunchy.oeuvreapi.model.dto.response.TransactionDetailResponse;
 import com.muffincrunchy.oeuvreapi.model.dto.response.TransactionResponse;
 import com.muffincrunchy.oeuvreapi.model.entity.*;
 import com.muffincrunchy.oeuvreapi.repository.TransactionRepository;
@@ -15,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Date;
@@ -32,12 +32,14 @@ public class TransactionServiceImpl implements TransactionService {
     private final PaymentService paymentService;
     private final Validation validation;
 
+    @Transactional(readOnly = true)
     @Override
     public List<TransactionResponse> getAll() {
         List<Transaction> transactions = transactionRepository.findAll();
         return transactions.stream().map(ToResponse::parseTransaction).toList();
     }
 
+    @Transactional(readOnly = true)
     @Override
     public TransactionResponse getById(String id) {
         Transaction transaction = transactionRepository.findById(id).orElse(null);
@@ -47,12 +49,9 @@ public class TransactionServiceImpl implements TransactionService {
         return null;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<TransactionResponse> getAllByUserId(PagingRequest pagingRequest, String userId) {
-        transactionRepository.findAllByUserId(userId).forEach(transaction -> updateStatus(transaction.getId()));
-        if (pagingRequest.getPage() <= 0) {
-            pagingRequest.setPage(1);
-        }
         Sort sort = Sort.by(Sort.Direction.fromString(pagingRequest.getDirection()), pagingRequest.getSortBy());
         Pageable pageable = PageRequest.of(pagingRequest.getPage()-1, pagingRequest.getSize(), sort);
         List<Transaction> transactions = transactionRepository.findAllByUserId(userId);
@@ -62,6 +61,7 @@ public class TransactionServiceImpl implements TransactionService {
         return new PageImpl<>(transactionResponses.subList(start, end), pageable, transactionResponses.size());
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public TransactionResponse create(CreateTransactionRequest request) {
         validation.validate(request);
@@ -92,14 +92,15 @@ public class TransactionServiceImpl implements TransactionService {
 
         Payment payment = paymentService.createPayment(transaction);
         transaction.setPayment(payment);
-        transactionRepository.updatePayment(transaction.getId(), payment.getId());
 
         return ToResponse.parseTransaction(transaction);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
-    public void updateStatus(String id) {
-        Transaction transaction = transactionRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "data not found"));
-        paymentService.updateTransactionStatus(transaction.getPayment().getId());
+    public void updateStatus(UpdatePaymentStatusRequest request) {
+        Transaction transaction = transactionRepository.findById(request.getOrderId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "data not found"));
+        Payment payment = transaction.getPayment();
+        payment.setTransactionStatus(request.getPaymentStatus());
     }
 }

@@ -14,6 +14,7 @@ import com.muffincrunchy.oeuvreapi.utils.validation.Validation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -28,12 +29,14 @@ public class ProductReviewServiceImpl implements ProductReviewService {
     private final TransactionDetailService transactionDetailService;
     private final Validation validation;
 
+    @Transactional(readOnly = true)
     @Override
     public List<ProductReviewResponse> getAll() {
         List<ProductReview> productReviews = productReviewRepository.findAll();
         return productReviews.stream().map(ToResponse::parseProductReview).toList();
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<ProductReviewResponse> getByProductId(PagingRequest pagingRequest, String productId) {
         if (pagingRequest.getPage() <= 0) {
@@ -48,6 +51,7 @@ public class ProductReviewServiceImpl implements ProductReviewService {
         return new PageImpl<>(productReviewResponses.subList(start, end), pageable, productReviewResponses.size());
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<ProductReviewResponse> getByUserID(PagingRequest pagingRequest, String userId) {
         if (pagingRequest.getPage() <= 0) {
@@ -62,11 +66,13 @@ public class ProductReviewServiceImpl implements ProductReviewService {
         return new PageImpl<>(productReviewResponses.subList(start, end), pageable, productReviewResponses.size());
     }
 
+    @Transactional(readOnly = true)
     @Override
     public ProductReview getById(String id) {
         return productReviewRepository.findById(id).orElse(null);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public ProductReviewResponse getByTransactionDetailId(String transactionDetailId) {
         ProductReview productReview = productReviewRepository.findByTransactionDetailId(transactionDetailId).orElse(null);
@@ -76,6 +82,7 @@ public class ProductReviewServiceImpl implements ProductReviewService {
         return null;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public ProductReviewResponse getResponseById(String id) {
         ProductReview productReview = productReviewRepository.findById(id).orElse(null);
@@ -85,6 +92,7 @@ public class ProductReviewServiceImpl implements ProductReviewService {
         return null;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public ProductReviewResponse create(CreateProductReviewRequest request) {
         validation.validate(request);
@@ -100,6 +108,7 @@ public class ProductReviewServiceImpl implements ProductReviewService {
         return ToResponse.parseProductReview(productReview);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void delete(String id) {
         productReviewRepository.deleteById(id);

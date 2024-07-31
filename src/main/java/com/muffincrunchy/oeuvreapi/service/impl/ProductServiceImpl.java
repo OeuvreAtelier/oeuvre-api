@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -49,6 +50,7 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<ProductResponse> getAll(PagingRequest pagingRequest) {
         if (pagingRequest.getPage() <= 0) {
@@ -63,6 +65,7 @@ public class ProductServiceImpl implements ProductService {
         return new PageImpl<>(productResponses.subList(start, end), pageable, productResponses.size());
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<ProductResponse> getBySearch(PagingRequest pagingRequest, SearchProductRequest request) {
         if (pagingRequest.getPage() <= 0) {
@@ -78,6 +81,7 @@ public class ProductServiceImpl implements ProductService {
         return new PageImpl<>(productResponses.subList(start, end), pageable, productResponses.size());
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<ProductResponse> getByUser(PagingRequest pagingRequest, String userId) {
         if (pagingRequest.getPage() <= 0) {
@@ -92,11 +96,13 @@ public class ProductServiceImpl implements ProductService {
         return new PageImpl<>(productResponses.subList(start, end), pageable, productResponses.size());
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Product getById(String id) {
         return productRepository.findById(id).orElse(null);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public ProductResponse getResponseById(String id) {
         Product product = productRepository.findById(id).orElse(null);
@@ -106,6 +112,7 @@ public class ProductServiceImpl implements ProductService {
         return null;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public ProductResponse create(CreateProductRequest request) {
         validation.validate(request);
@@ -137,6 +144,7 @@ public class ProductServiceImpl implements ProductService {
         return ToResponse.parseProduct(product);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public ProductResponse update(UpdateProductRequest request) {
         validation.validate(request);
@@ -173,10 +181,10 @@ public class ProductServiceImpl implements ProductService {
             }
         }
         product.setUpdatedAt(new Date());
-        productRepository.saveAndFlush(product);
         return ToResponse.parseProduct(product);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void delete(String id) {
         String imgId = getById(id).getImage().getId();

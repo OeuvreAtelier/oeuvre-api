@@ -11,6 +11,7 @@ import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -26,6 +27,7 @@ public class ImageServiceImpl implements ImageService {
     private final ImageRepository imageRepository;
     private final ImageKit imageKit;
 
+    @Transactional(rollbackFor = Error.class)
     @Override
     public Image create(MultipartFile multipartFile, String directoryPath) {
         try {
@@ -55,11 +57,13 @@ public class ImageServiceImpl implements ImageService {
         }
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Image getById(String id) {
         return imageRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "data not found"));
     }
 
+    @Transactional(rollbackFor = Error.class)
     @Override
     public void deleteById(String id) {
         try {

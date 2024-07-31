@@ -93,13 +93,20 @@ public class TransactionController {
         return ResponseEntity.ok(response);
     }
 
-//    @PutMapping("/{id}")
-//    public ResponseEntity<CommonResponse<?>> updateStatus(@PathVariable("id") String id) {
-//        transactionService.updateStatus(id);
-//        return ResponseEntity.ok(CommonResponse.builder()
-//                .statusCode(HttpStatus.OK.value())
-//                .message("success update data")
-//                .build());
-//    }
+    @PostMapping("/status")
+    public ResponseEntity<CommonResponse<?>> updateStatus(@RequestBody Map<String, Object> request) {
+        UpdatePaymentStatusRequest updateStatus = UpdatePaymentStatusRequest.builder()
+                .orderId(request.get("order_id").toString())
+                .paymentStatus(request.get("transaction_status").toString())
+                .build();
+        transactionService.updateStatus(updateStatus);
+        return ResponseEntity.ok(
+                CommonResponse.builder()
+                        .statusCode(HttpStatus.OK.value())
+                        .message("successfully update status")
+                        .build()
+        );
+    }
+
 
 }
