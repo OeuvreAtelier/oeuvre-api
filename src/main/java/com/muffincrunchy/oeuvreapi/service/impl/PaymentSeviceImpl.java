@@ -93,22 +93,4 @@ public class PaymentSeviceImpl implements PaymentService {
                 .build();
         return paymentRepository.saveAndFlush(payment);
     }
-
-    @Override
-    public void updateTransactionStatus(String id) {
-        Payment payment = paymentRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "data not found"));
-        try {
-            ResponseEntity<String> midtransResponse = restClient.get()
-                    .uri(String.format("https://app.sandbox.midtrans.com/snap/v1/transactions/%s/status", payment.getToken()))
-                    .retrieve()
-                    .toEntity(String.class);
-            Map<String, Object> mapResponse = objectMapper.readValue(midtransResponse.getBody(), new TypeReference<>() {});
-            log.info("Update transaction status: {}", mapResponse);
-            if (mapResponse.get("transaction_status") != null) {
-                paymentRepository.updateTransactionStatus(id, mapResponse.get("transaction_status").toString());
-            }
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "transaction not found");
-        }
-    }
 }

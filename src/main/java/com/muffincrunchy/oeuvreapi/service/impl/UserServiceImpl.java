@@ -16,6 +16,7 @@ import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Date;
@@ -41,12 +42,14 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<UserResponse> getAll() {
         List<User> users = userRepository.findAll();
         return users.stream().map(ToResponse::parseUser).toList();
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<UserResponse> searchArtist(PagingRequest pagingRequest, SearchArtistRequest request) {
         if (pagingRequest.getPage() <= 0) {
@@ -62,11 +65,13 @@ public class UserServiceImpl implements UserService {
         return new PageImpl<>(userResponses.subList(start, end), pageable, userResponses.size());
     }
 
+    @Transactional(readOnly = true)
     @Override
     public User getById(String id) {
         return userRepository.findById(id).orElse(null);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public UserResponse getResponseById(String id) {
         User user = userRepository.findById(id).orElse(null);
@@ -76,6 +81,7 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public User create(User request) {
         validation.validate(request);
@@ -84,6 +90,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.saveAndFlush(request);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public UserResponse update(UpdateUserRequest request) {
         validation.validate(request);
@@ -100,15 +107,16 @@ public class UserServiceImpl implements UserService {
         user.setBirthDate(request.getBirthDate());
         user.setPhoneNumber(request.getPhoneNumber());
         user.setUpdatedAt(new Date());
-        userRepository.saveAndFlush(user);
         return ToResponse.parseUser(user);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void delete(String id) {
         userRepository.delete(getById(id));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public UserResponse getByUserAccountId(String userAccountId) {
         User user = userRepository.findByUserAccountId(userAccountId).orElse(null);
@@ -118,12 +126,14 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void updateArtistStatusById(String id, Boolean isArtist) {
         getById(id);
         userRepository.updateArtistStatus(id, isArtist);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void updateUserPicture(UpdateUserPictureRequest request) {
         User user = getById(request.getUserId());
@@ -140,6 +150,7 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void updateUserBanner(UpdateUserBannerRequest request) {
         User user = getById(request.getUserId());
@@ -155,6 +166,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void saveStore(String id, String storeId) {
         getById(id);

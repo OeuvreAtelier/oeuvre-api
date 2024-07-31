@@ -6,5 +6,4 @@ import com.muffincrunchy.oeuvreapi.model.entity.Transaction;
 public interface PaymentService {
 
     Payment createPayment(Transaction transaction);
-    void updateTransactionStatus(String id);
 }

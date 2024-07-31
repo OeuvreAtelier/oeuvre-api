@@ -14,5 +14,5 @@ public interface TransactionService {
     Page<TransactionResponse> getAllByUserId(PagingRequest pagingRequest, String userId);
     TransactionResponse getById(String id);
     TransactionResponse create(CreateTransactionRequest request);
-    void updateStatus(String id);
+    void updateStatus(UpdatePaymentStatusRequest request);
 }

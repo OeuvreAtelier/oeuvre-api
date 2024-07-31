@@ -11,6 +11,7 @@ import com.muffincrunchy.oeuvreapi.utils.parsing.ToResponse;
 import com.muffincrunchy.oeuvreapi.utils.validation.Validation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -23,12 +24,14 @@ public class AddressServiceImpl implements AddressService {
     private final UserService userService;
     private final Validation validation;
 
+    @Transactional(readOnly = true)
     @Override
     public List<AddressResponse> getAll() {
         List<Address> addresses = addressRepository.findAll();
         return addresses.stream().map(ToResponse::parseAddress).toList();
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<AddressResponse> getByUserId(String userId) {
         List<Address> addresses = addressRepository.findAllByUserId(userId);
@@ -44,11 +47,13 @@ public class AddressServiceImpl implements AddressService {
         return null;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Address getById(String id) {
         return addressRepository.findById(id).orElse(null);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public AddressResponse create(CreateAddressRequest request) {
         validation.validate(request);
@@ -67,6 +72,7 @@ public class AddressServiceImpl implements AddressService {
         return ToResponse.parseAddress(address);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public AddressResponse update(UpdateAddressRequest request) {
         validation.validate(request);
@@ -78,10 +84,10 @@ public class AddressServiceImpl implements AddressService {
         address.setPostalCode(request.getPostalCode());
         address.setPhoneNumber(request.getPhoneNumber());
         address.setUpdatedAt(new Date());
-        addressRepository.saveAndFlush(address);
         return ToResponse.parseAddress(address);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void delete(String id) {
         addressRepository.deleteById(id);
