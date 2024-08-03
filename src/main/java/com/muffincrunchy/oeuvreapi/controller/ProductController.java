@@ -115,7 +115,7 @@ public class ProductController {
     public ResponseEntity<CommonResponse<List<ProductResponse>>> getProductsByArtist(
             @PathVariable("id") String id,
             @RequestParam(name = "page", defaultValue = "1") Integer page,
-            @RequestParam(name = "size", defaultValue = "24") Integer size,
+            @RequestParam(name = "size", defaultValue = "16") Integer size,
             @RequestParam(name = "sortBy", defaultValue = "updatedAt") String sortBy,
             @RequestParam(name = "direction", defaultValue = "desc") String direction
     ) {

@@ -27,7 +27,7 @@ public class ImageServiceImpl implements ImageService {
     private final ImageRepository imageRepository;
     private final ImageKit imageKit;
 
-    @Transactional(rollbackFor = Error.class)
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Image create(MultipartFile multipartFile, String directoryPath) {
         try {
@@ -63,7 +63,7 @@ public class ImageServiceImpl implements ImageService {
         return imageRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "data not found"));
     }
 
-    @Transactional(rollbackFor = Error.class)
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteById(String id) {
         try {

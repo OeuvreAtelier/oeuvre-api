@@ -1,5 +1,6 @@
 package com.muffincrunchy.oeuvreapi.service.impl;
 
+import com.muffincrunchy.oeuvreapi.model.constant.ItemType;
 import com.muffincrunchy.oeuvreapi.model.dto.request.CreateTransactionRequest;
 import com.muffincrunchy.oeuvreapi.model.dto.request.PagingRequest;
 import com.muffincrunchy.oeuvreapi.model.dto.request.UpdatePaymentStatusRequest;
@@ -78,7 +79,9 @@ public class TransactionServiceImpl implements TransactionService {
                     if (product.getStock() < detailRequest.getQuantity()) {
                         throw new RuntimeException("Out of stock");
                     }
-                    product.setStock(product.getStock() - detailRequest.getQuantity());
+                    if (product.getType().getType().equals(ItemType.PHYSICAL)) {
+                        product.setStock(product.getStock() - detailRequest.getQuantity());
+                    }
                     return TransactionDetail.builder()
                             .transaction(transaction)
                             .invoice(Generator.InvoiceGenerator())

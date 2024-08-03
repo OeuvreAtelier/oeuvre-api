@@ -140,6 +140,9 @@ public class ProductServiceImpl implements ProductService {
                 .updatedAt(new Date())
                 .image(image)
                 .build();
+        if (product.getType().getType().equals(ItemType.DIGITAL)) {
+            product.setStock(99);
+        }
         productRepository.saveAndFlush(product);
         return ToResponse.parseProduct(product);
     }
@@ -160,6 +163,9 @@ public class ProductServiceImpl implements ProductService {
         product.setPrice(request.getPrice());
         product.setStock(request.getStock());
         product.setType(typeService.getOrSave(ItemType.valueOf(request.getType())));
+        if (product.getType().getType().equals(ItemType.DIGITAL)) {
+            product.setStock(99);
+        }
         if (!request.getDescription().isEmpty()) {
             if (product.getDescription() == null) {
                 product.setDescription(
