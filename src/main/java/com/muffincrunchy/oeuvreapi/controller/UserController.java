@@ -10,6 +10,7 @@ import com.muffincrunchy.oeuvreapi.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -108,7 +109,7 @@ public class UserController {
 //    }
 
     @PutMapping
-    public ResponseEntity<CommonResponse<?>> updateUserPicture(@RequestBody UpdateUserRequest request) {
+    public ResponseEntity<CommonResponse<?>> updateUser(@RequestBody UpdateUserRequest request) {
         UserResponse user = userService.update(request);
         CommonResponse<UserResponse> response = CommonResponse.<UserResponse>builder()
                 .statusCode(HttpStatus.OK.value())
@@ -118,7 +119,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/picture")
+    @PutMapping(path = "/picture", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CommonResponse<?>> updateUserPicture(@RequestPart(name = "user") String user, @RequestPart(name = "image", required = false) MultipartFile image) {
         CommonResponse.CommonResponseBuilder<UserResponse> responseBuilder = CommonResponse.builder();
         try {
@@ -136,7 +137,7 @@ public class UserController {
         }
     }
 
-    @PutMapping("/banner")
+    @PutMapping(path = "/banner", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CommonResponse<?>> updateUserBanner(@RequestPart(name = "user") String user, @RequestPart(name = "image", required = false) MultipartFile image) {
         CommonResponse.CommonResponseBuilder<UserResponse> responseBuilder = CommonResponse.builder();
         try {

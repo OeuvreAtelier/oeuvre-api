@@ -18,4 +18,5 @@ public interface ProductReviewService {
     ProductReviewResponse getByTransactionDetailId(String transactionDetailId);
     ProductReviewResponse create(CreateProductReviewRequest request);
     void delete(String id);
+//    Double averageRating(String productId);
 }

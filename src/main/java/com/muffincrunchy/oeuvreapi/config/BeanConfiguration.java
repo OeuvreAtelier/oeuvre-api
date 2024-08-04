@@ -1,6 +1,7 @@
 package com.muffincrunchy.oeuvreapi.config;
 
 import io.imagekit.sdk.ImageKit;
+import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,6 +44,11 @@ public class BeanConfiguration {
     @Bean
     public RestClient restClient() {
         return RestClient.create();
+    }
+
+    @Bean
+    public OkHttpClient okHttpClient() {
+        return new OkHttpClient();
     }
 }
 
