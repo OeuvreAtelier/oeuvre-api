@@ -3,6 +3,7 @@ package com.muffincrunchy.oeuvreapi.service;
 import com.muffincrunchy.oeuvreapi.model.dto.request.CreateProductReviewRequest;
 import com.muffincrunchy.oeuvreapi.model.dto.request.PagingRequest;
 import com.muffincrunchy.oeuvreapi.model.dto.response.ProductReviewResponse;
+import com.muffincrunchy.oeuvreapi.model.dto.response.RatingResponse;
 import com.muffincrunchy.oeuvreapi.model.entity.ProductReview;
 import org.springframework.data.domain.Page;
 
@@ -18,5 +19,5 @@ public interface ProductReviewService {
     ProductReviewResponse getByTransactionDetailId(String transactionDetailId);
     ProductReviewResponse create(CreateProductReviewRequest request);
     void delete(String id);
-//    Double averageRating(String productId);
+    RatingResponse getAverageRating(String productId);
 }

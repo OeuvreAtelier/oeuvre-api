@@ -3,6 +3,7 @@ package com.muffincrunchy.oeuvreapi.service.impl;
 import com.muffincrunchy.oeuvreapi.model.dto.request.CreateProductReviewRequest;
 import com.muffincrunchy.oeuvreapi.model.dto.request.PagingRequest;
 import com.muffincrunchy.oeuvreapi.model.dto.response.ProductReviewResponse;
+import com.muffincrunchy.oeuvreapi.model.dto.response.RatingResponse;
 import com.muffincrunchy.oeuvreapi.model.entity.ProductReview;
 import com.muffincrunchy.oeuvreapi.repository.ProductReviewRepository;
 import com.muffincrunchy.oeuvreapi.service.ProductReviewService;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.OptionalDouble;
 
 @RequiredArgsConstructor
 @Service
@@ -112,5 +114,21 @@ public class ProductReviewServiceImpl implements ProductReviewService {
     @Override
     public void delete(String id) {
         productReviewRepository.deleteById(id);
+    }
+
+    @Override
+    public RatingResponse getAverageRating(String productId) {
+        List<ProductReview> productReviews = productReviewRepository.findAllByProductId(productId);
+        if (!productReviews.isEmpty()) {
+            OptionalDouble avgRate = productReviews.stream().mapToDouble(ProductReview::getRating).average();
+            return RatingResponse.builder()
+                    .productId(productId)
+                    .rating(avgRate.isPresent() ? avgRate.getAsDouble() : 0.0)
+                    .build();
+        }
+        return RatingResponse.builder()
+                .productId(productId)
+                .rating(0.0)
+                .build();
     }
 }

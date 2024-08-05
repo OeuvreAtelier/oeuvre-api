@@ -5,6 +5,7 @@ import com.muffincrunchy.oeuvreapi.model.dto.request.PagingRequest;
 import com.muffincrunchy.oeuvreapi.model.dto.response.CommonResponse;
 import com.muffincrunchy.oeuvreapi.model.dto.response.PagingResponse;
 import com.muffincrunchy.oeuvreapi.model.dto.response.ProductReviewResponse;
+import com.muffincrunchy.oeuvreapi.model.dto.response.RatingResponse;
 import com.muffincrunchy.oeuvreapi.service.ProductReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -130,6 +131,17 @@ public class ProductReviewController {
                 .statusCode(HttpStatus.OK.value())
                 .message("success save data")
                 .data(productReview)
+                .build();
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("rating/product/{product_id}")
+    public ResponseEntity<CommonResponse<RatingResponse>> getProductRating(@PathVariable("product_id") String productId) {
+        RatingResponse rating = productReviewService.getAverageRating(productId);
+        CommonResponse<RatingResponse> response = CommonResponse.<RatingResponse>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("success save data")
+                .data(rating)
                 .build();
         return ResponseEntity.ok(response);
     }
